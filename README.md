@@ -8,13 +8,17 @@ To run this tool you will need the following sofware installed on your computer:
 + [ImageMagick](https://imagemagick.org/script/download.php)
 + [Python (3.11)](https://www.python.org/downloads/release/python-3116/)
 
+Once you are at your desired working directory, run the following commands on your terminal:
+
 ```{bash}
-git clone git@github.com:marquesafonso/resultados_eleitorais_autarquias_76-97.git
+git clone git@github.com:marquesafonso/multilang-asr-captioner.git
 
 pip install pipenv
 
 pipenv install
 ```
+
+Note that this assumes a proper Git installation and ssh key configuration. 
 
 ## Quick start
 
