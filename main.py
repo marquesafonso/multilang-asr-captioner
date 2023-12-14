@@ -29,7 +29,7 @@ def main(video_url,
             pbar.update(33.34)
             return
         if not os.path.exists(srt_path):
-            transcriber(stream_title, srt_path)
+            transcriber(os.path.join(invideo_dir,invideo_filename), srt_path)
         pbar.update(66.66)
         subtitler(os.path.join(invideo_dir,invideo_filename), srt_path, outvideo_path, fontsize,bg_color)
         pbar.update(33.34)
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     parser.add_argument('--invideo_filename', required=True, type=str, help='filename and extension of ')
     parser.add_argument('--outvideo_path', required=True, help='path to the output video')
     parser.add_argument('--video_url', required=False, default=None, type=str, help='A video file to be subtitled (Optional)')
-    parser.add_argument('--srt_path', required=False, default="./data/audio.srt", type=str, help='path to the srt file (default: data/audio.srt)')
+    parser.add_argument('--srt_path', required=False, default="data/audio.srt", type=str, help='path to the srt file (default: data/audio.srt)')
     parser.add_argument('--fontsize', required=False, default=32, type=int, help='Font size for captions (int)')
     parser.add_argument('--bg_color', required=False, default="#070a13b3", type=str, help='Hex color value for caption background colour.')
     args = parser.parse_args()

@@ -1,8 +1,10 @@
+data/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 data/*
+Python-3.11.6/
 
 # C extensions
 *.so

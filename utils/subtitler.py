@@ -1,4 +1,5 @@
 from moviepy.editor import VideoFileClip, CompositeVideoClip, TextClip
+import os
 
 def parse_srt(srt_file):
     """Parse the SRT file and return a list of (start, end, text) for each subtitle."""
@@ -23,6 +24,10 @@ def parse_srt(srt_file):
 
 def subtitler(video_file, srt_file, output_file,fontsize, bg_color):
     """Add subtitles from an SRT file to a video."""
+    video_file = os.path.abspath(video_file)
+    srt_file = os.path.abspath(srt_file)
+    output_file = os.path.abspath(output_file)
+    
     clip = VideoFileClip(video_file)
     subtitles = parse_srt(srt_file)
 

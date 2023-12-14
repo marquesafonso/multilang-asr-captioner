@@ -1,5 +1,5 @@
 from faster_whisper import WhisperModel
-import logging
+import logging, os
 
 logging.basicConfig(filename='main.log',
                 encoding='utf-8',
@@ -15,6 +15,7 @@ def write_srt(segments, srt_path):
             file.write(f"{i+1}\n{segment.start} --> {segment.end}\n{segment.text}\n\n")
 
 def transcriber(input_path:str, srt_path:str):
+    str_path = os.path.abspath(srt_path)
     model_size = "large-v3"
 
     # Run on GPU with FP16
