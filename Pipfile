@@ -8,6 +8,10 @@ pytube = "*"
 faster-whisper = "*"
 moviepy = "*"
 tqdm = "*"
+requests = "*"
+python-multipart = "*"
+fastapi = "*"
+uvicorn = "*"
 
 [dev-packages]
 

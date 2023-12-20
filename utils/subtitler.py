@@ -22,7 +22,11 @@ def parse_srt(srt_file):
     return subtitles
 
 
-def subtitler(video_file, srt_file, output_file,fontsize, bg_color):
+def subtitler(video_file:str,
+            srt_file:str,
+            output_file:str,
+            fontsize:int,
+            bg_color:str):
     """Add subtitles from an SRT file to a video."""
     video_file = os.path.abspath(video_file)
     srt_file = os.path.abspath(srt_file)
