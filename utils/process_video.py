@@ -1,5 +1,4 @@
 # Import necessary modules
-from utils.download_video import download_video
 from utils.transcriber import transcriber
 from utils.subtitler import subtitler
 import logging, os
@@ -13,15 +12,21 @@ logging.basicConfig(filename='main.log',
 
 # API Function
 def process_video(invideo_filename:str,
+                  srt_path: str,
+                  max_words_per_line:int,
                   fontsize:str,
+                  font:str,
                   bg_color:str,
-                  max_words_per_line:int
+                  text_color:str
                   ):
+    OUTVIDEO_PATH = os.path.join("temp/", "result.mp4")
+    if srt_path:
+        subtitler(invideo_filename, srt_path, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
+        return OUTVIDEO_PATH
     SRT_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.srt")
-    OUTVIDEO_PATH = os.path.join("temp/", f"result.mp4")
     if not os.path.exists(SRT_PATH):
         transcriber(invideo_filename, SRT_PATH, max_words_per_line)
     logging.info("Transcription Complete")
-    subtitler(invideo_filename, SRT_PATH, OUTVIDEO_PATH, fontsize, bg_color)
+    subtitler(invideo_filename, SRT_PATH, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
     logging.info("Subtitling Complete")
     return OUTVIDEO_PATH

@@ -1,5 +1,0 @@
-[example no background]
-pipenv run python .\main.py --invideo_dir './data/' --invideo_filename '<your_video>.mp4' --outvideo_path './data/<output_video>.mp4' --video_url 'https://www.youtube.com/watch?v=<your_youtube_video>' --srt_path '<your_srt_file>.srt' --fontsize 28 --bg_color None
-
-[example with background]
-pipenv run python .\main.py --invideo_dir './data/' --invideo_filename '<your_video>.mp4' --outvideo_path './data/<output_video>.mp4' --video_url 'https://www.youtube.com/watch?v=<your_youtube_video>' --srt_path '<your_srt_file>.srt'

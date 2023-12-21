@@ -22,14 +22,28 @@ Note that this assumes a proper Git installation and ssh key configuration.
 
 ## Quick start
 
-Run the following code to your example. The example is based on a youtube video url (optional):
+### Command Line Interface
+
+Run the following code to your example using the CLI. The example is based on a youtube video url (optional):
 
 ```
-pipenv run python .\main.py --invideo_dir './data/' --invideo_filename '<your_video>.mp4' --outvideo_path './data/<output_video>.mp4' --video_url 'https://www.youtube.com/watch?v=<your_youtube_video>' --srt_path '<your_srt_file>.srt'
+pipenv run python .\cli.py --invideo_filename '<your_file_name>' --video_url 'https://www.youtube.com/watch?v=<your_youtube_video>' --max_words_per_line 8
 ```
 
-Fontsize and Background Color arguments are available:
+Fontsize, Font, Background Color and Text Color arguments are available:
 
 ```
-pipenv run python .\main.py --invideo_dir './data/' --invideo_filename '<your_video>.mp4' --outvideo_path './data/<output_video>.mp4' --video_url 'https://www.youtube.com/watch?v=<your_youtube_video>' --srt_path '<your_srt_file>.srt' --fontsize 28 --bg_color None
+pipenv run python .\cli.py --invideo_filename '<your_file>' --video_url 'https://www.youtube.com/watch?v=<your_youtube_video>' --max_words_per_line 8 --fontsize 28 --font "Arial-Bold" --bg_color None --text_color 'white'
 ```
+
+### API
+
+A FastAPI API is also made available.
+
+To start the API run:
+
+```
+pipenv run uvicorn main:app --reload
+```
+
+Then check the [submit_video](http://127.0.0.1:8000/submit_video/) endpoint.

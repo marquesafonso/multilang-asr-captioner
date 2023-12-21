@@ -59,5 +59,3 @@ def transcriber(input_path:str,
     logging.info("Detected language '%s' with probability %f" % (info.language, info.language_probability))
     logging.info("Writing file...")
     write_srt(segments=segments, srt_path=srt_path, max_words_per_line=max_words_per_line)
-
-
