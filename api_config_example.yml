@@ -1,0 +1,4 @@
+api_config:
+  secrets:
+    username: user
+    password: password

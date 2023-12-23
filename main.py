@@ -1,9 +1,11 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Depends
 from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Optional
 from utils.process_video import process_video
 from utils.zip_response import zip_response
-import shutil, os, logging
+from utils.api_configs import api_configs
+import shutil, os, logging, uvicorn, secrets
 
 logging.basicConfig(filename='main.log',
                 encoding='utf-8',
@@ -11,6 +13,19 @@ logging.basicConfig(filename='main.log',
                 format='%(asctime)s %(levelname)s %(message)s',
                 datefmt='%m/%d/%Y %I:%M:%S %p')
 
+security = HTTPBasic()
+api_configs_file = os.path.abspath("api_config_example.yml") 
+
+def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, api_configs(api_configs_file)["secrets"]["username"])
+    correct_password = secrets.compare_digest(credentials.password, api_configs(api_configs_file)["secrets"]["password"])
+    if not (correct_username and correct_password):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Basic"},
+        )
+    return credentials.username
 
 app = FastAPI()
 
@@ -45,11 +60,14 @@ async def process_video_api(video_file: UploadFile = File(...),
                             fontsize: Optional[int] = Form(36),
                             font: Optional[str] = Form("FuturaPTHeavy"),
                             bg_color: Optional[str] = Form("#070a13b3"),
-                            text_color: Optional[str] = Form("white")
+                            text_color: Optional[str] = Form("white"),
+                            username: str = Depends(get_current_user)
                             ):
     try:
         if not str(video_file.filename).endswith('.mp4'):
-            raise HTTPException(status_code=400, detail="Invalid file type. Please upload an MP4 file.")
+            raise HTTPException(status_code=400, detail="Invalid Video File type. Please upload an MP4 file.")
+        if srt_file.size > 0 and not str(srt_file.filename).endswith('.srt'):
+            raise HTTPException(status_code=400, detail="Invalid Subtitles File type. Please upload an SRT file.")
         logging.info("Creating temporary directories")
         temp_dir = os.path.join(os.getcwd(),"temp")
         os.makedirs(temp_dir, exist_ok=True)
@@ -83,3 +101,7 @@ async def process_video_api(video_file: UploadFile = File(...),
                 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+if __name__ == "__main__":
+    # Use Uvicorn to run the application
+    uvicorn.run(app, host="127.0.0.1", port=8000)
