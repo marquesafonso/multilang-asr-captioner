@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from utils.download_video import download_video
 from utils.transcriber import transcriber
 from utils.subtitler import subtitler
-from utils.convert_mp4_to_mp3 import convert_mp4_to_mp3
+from utils.convert_video_to_audio import convert_video_to_audio
 import logging, os
 from tqdm import tqdm
 
@@ -28,8 +28,8 @@ def main(video_url:str,
         if video_url != None:
             INVIDEO_PATH = download_video(video_url, INVIDEO_DIR, invideo_filename)
             pbar.update(25)
-            INAUDIO_PATH = os.path.join(INVIDEO_DIR, f"{invideo_filename}.mp3")
-            convert_mp4_to_mp3(INVIDEO_PATH,INAUDIO_PATH)
+            INAUDIO_PATH = os.path.join(INVIDEO_DIR, f"{invideo_filename}.m4a")
+            convert_video_to_audio(INVIDEO_PATH,INAUDIO_PATH)
             pbar.update(25)
             if not os.path.exists(SRT_PATH):
                 transcriber(INAUDIO_PATH, SRT_PATH, max_words_per_line)
@@ -38,9 +38,9 @@ def main(video_url:str,
             pbar.update(25)
             return
         INVIDEO_PATH = os.path.join(INVIDEO_DIR, f"{invideo_filename}.mp4")
-        INAUDIO_PATH = os.path.join(INVIDEO_DIR, f"{invideo_filename}.mp3")
+        INAUDIO_PATH = os.path.join(INVIDEO_DIR, f"{invideo_filename}.m4a")
         if not os.path.exists(INAUDIO_PATH):
-            convert_mp4_to_mp3(INVIDEO_PATH,INAUDIO_PATH)
+            convert_video_to_audio(INVIDEO_PATH,INAUDIO_PATH)
         pbar.update(50)
         if not os.path.exists(SRT_PATH):
             transcriber(INAUDIO_PATH, SRT_PATH, max_words_per_line)
