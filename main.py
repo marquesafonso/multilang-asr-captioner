@@ -71,15 +71,15 @@ async def process_video_api(video_file: UploadFile = File(...),
                 finally:
                     srt_file.file.close()
             logging.info("Processing the video...")
-            output_path = process_video(temp_input_path, SRT_PATH, max_words_per_line, fontsize, font, bg_color, text_color)
+            output_path, srt_path = process_video(temp_input_path, SRT_PATH, max_words_per_line, fontsize, font, bg_color, text_color)
             logging.info("Archiving response...")
-            zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [SRT_PATH, output_path])
-            return FileResponse(zip_path, media_type='application/zip', filename=f'result_{video_file.filename}.zip')
+            zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, srt_path])
+            return FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
         logging.info("Processing the video...")
-        output_path = process_video(temp_input_path, None, max_words_per_line, fontsize, font, bg_color, text_color)
+        output_path, srt_path = process_video(temp_input_path, None, max_words_per_line, fontsize, font, bg_color, text_color)
         logging.info("Archiving response...")
-        zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [SRT_PATH, output_path])
-        return  FileResponse(zip_path, media_type='application/zip', filename=f'result_{video_file.filename}.zip')
+        zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, srt_path])
+        return  FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
                 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

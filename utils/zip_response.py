@@ -6,5 +6,4 @@ def zip_response(archive_name: str, files: list):
     # Add specific files to the zip file
         for file in files:
             zipf.write(file, arcname=os.path.basename(file))
-            zipf.write(file, arcname=os.path.basename(file))
     return archive_name

@@ -25,12 +25,14 @@ def process_video(invideo_filename:str,
     if srt_path:
         subtitler(invideo_filename, srt_path, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
         return OUTVIDEO_PATH
+    logging.info("Converting Video to Audio")
     INAUDIO_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.mp3")
-    convert_mp4_to_mp3(invideo_filename, INAUDIO_PATH)
+    if not os.path.exists(INAUDIO_PATH):
+        convert_mp4_to_mp3(invideo_filename, INAUDIO_PATH)
     SRT_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.srt") 
+    logging.info("Transcribing...")
     if not os.path.exists(SRT_PATH):
         transcriber(INAUDIO_PATH, SRT_PATH, max_words_per_line)
-    logging.info("Transcription Complete")
+    logging.info("Subtitling...")
     subtitler(invideo_filename, SRT_PATH, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
-    logging.info("Subtitling Complete")
-    return OUTVIDEO_PATH
+    return OUTVIDEO_PATH, SRT_PATH
