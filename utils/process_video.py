@@ -1,7 +1,7 @@
 # Import necessary modules
 from utils.transcriber import transcriber
 from utils.subtitler import subtitler
-from utils.convert_mp4_to_mp3 import convert_mp4_to_mp3
+from utils.convert_video_to_audio import convert_video_to_audio
 import logging, os
 
 # Set up logging
@@ -28,7 +28,7 @@ def process_video(invideo_filename:str,
     logging.info("Converting Video to Audio")
     INAUDIO_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.m4a")
     if not os.path.exists(INAUDIO_PATH):
-        convert_mp4_to_mp3(invideo_filename, INAUDIO_PATH)
+        convert_video_to_audio(invideo_filename, INAUDIO_PATH)
     SRT_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.srt") 
     logging.info("Transcribing...")
     if not os.path.exists(SRT_PATH):

@@ -12,6 +12,7 @@ requests = "*"
 python-multipart = "*"
 fastapi = "*"
 uvicorn = "*"
+apscheduler = "*"
 
 [dev-packages]
 

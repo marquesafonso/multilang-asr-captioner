@@ -1,20 +1,19 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException, Form, Depends
+from fastapi import FastAPI, UploadFile, HTTPException, BackgroundTasks, File, Form, Depends
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Optional
 from utils.process_video import process_video
 from utils.zip_response import zip_response
 from utils.api_configs import api_configs
+from utils.archiver import archiver
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from datetime import datetime
 import shutil, os, logging, uvicorn, secrets
 
-logging.basicConfig(filename='main.log',
-                encoding='utf-8',
-                level=logging.DEBUG,
-                format='%(asctime)s %(levelname)s %(message)s',
-                datefmt='%m/%d/%Y %I:%M:%S %p')
-
+app = FastAPI()
+scheduler = AsyncIOScheduler()
 security = HTTPBasic()
-api_configs_file = os.path.abspath("api_config_example.yml") 
+api_configs_file = os.path.abspath("api_config_example.yml")
 
 def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, api_configs(api_configs_file)["secrets"]["username"])
@@ -27,7 +26,25 @@ def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
         )
     return credentials.username
 
-app = FastAPI()
+logging.basicConfig(filename='main.log',
+                encoding='utf-8',
+                level=logging.DEBUG,
+                format='%(asctime)s %(levelname)s %(message)s',
+                datefmt='%m/%d/%Y %I:%M:%S %p')
+
+# # 0 6 * * 6
+# @pycron.cron("*/5 * * * *")
+async def periodic_archiver(timestamp: datetime):
+    archive = os.path.abspath(os.path.join(os.getcwd(),"archive/"))
+    archiver(archive, timestamp)
+    logging.info(f"Archive writen at {timestamp}")
+
+@app.on_event("startup")
+def start_periodic_task():
+    # Schedule the job to run once every day at 3:00 AM
+    scheduler.add_job(periodic_archiver(datetime.now()), "cron", minute="*/2")
+    scheduler.start()
+
 
 @app.get("/")
 async def root():
@@ -89,9 +106,9 @@ async def process_video_api(video_file: UploadFile = File(...),
                 finally:
                     srt_file.file.close()
             logging.info("Processing the video...")
-            output_path, srt_path = process_video(temp_input_path, SRT_PATH, max_words_per_line, fontsize, font, bg_color, text_color)
+            output_path, _ = process_video(temp_input_path, SRT_PATH, max_words_per_line, fontsize, font, bg_color, text_color)
             logging.info("Archiving response...")
-            zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, srt_path])
+            zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, SRT_PATH])
             return FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
         logging.info("Processing the video...")
         output_path, srt_path = process_video(temp_input_path, None, max_words_per_line, fontsize, font, bg_color, text_color)
