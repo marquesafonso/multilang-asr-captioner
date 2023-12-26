@@ -1,5 +1,7 @@
 .gitignore
+.devcontainer
 __pycache__/
+*.git
 data/
 temp/
 cli.py
