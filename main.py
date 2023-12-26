@@ -1,17 +1,13 @@
-from fastapi import FastAPI, UploadFile, HTTPException, BackgroundTasks, File, Form, Depends
+from fastapi import FastAPI, UploadFile, HTTPException, File, Form, Depends
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Optional
 from utils.process_video import process_video
 from utils.zip_response import zip_response
 from utils.api_configs import api_configs
-from utils.archiver import archiver
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from datetime import datetime
 import shutil, os, logging, uvicorn, secrets
 
 app = FastAPI()
-scheduler = AsyncIOScheduler()
 security = HTTPBasic()
 api_configs_file = os.path.abspath("api_config_example.yml")
 
@@ -31,20 +27,6 @@ logging.basicConfig(filename='main.log',
                 level=logging.DEBUG,
                 format='%(asctime)s %(levelname)s %(message)s',
                 datefmt='%m/%d/%Y %I:%M:%S %p')
-
-# # 0 6 * * 6
-# @pycron.cron("*/5 * * * *")
-async def periodic_archiver(timestamp: datetime):
-    archive = os.path.abspath(os.path.join(os.getcwd(),"archive/"))
-    archiver(archive, timestamp)
-    logging.info(f"Archive writen at {timestamp}")
-
-@app.on_event("startup")
-def start_periodic_task():
-    # Schedule the job to run once every day at 3:00 AM
-    scheduler.add_job(periodic_archiver(datetime.now()), "cron", minute="*/2")
-    scheduler.start()
-
 
 @app.get("/")
 async def root():
