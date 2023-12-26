@@ -5,6 +5,7 @@ from typing import Optional
 from utils.process_video import process_video
 from utils.zip_response import zip_response
 from utils.api_configs import api_configs
+from utils.read_html import read_html
 import shutil, os, logging, uvicorn, secrets
 
 app = FastAPI()
@@ -34,21 +35,8 @@ async def root():
 
 @app.get("/submit_video/")
 async def get_form():
-    html_content = """
-    <html>
-        <body>
-            <form action="/process_video/" enctype="multipart/form-data" method="post">
-                Video File: <input type="file" name="video_file"><br>
-                Subtitles File: <input type="file" name="srt_file"><br>
-                Max words per line: <input type="number" name="max_words_per_line" value="8"><br>
-                Font size: <input type="number" name="fontsize" value="36"><br>
-                Font: <input type="text" name="font" value="FuturaPTHeavy"><br>
-                Background color: <input type="text" name="bg_color" value="#070a13b3"><br>
-                Text color: <input type="text" name="text_color" value="white"><br>
-                <input type="submit">
-            </form>
-        </body>
-    </html>
+    html_content = f"""
+    {read_html(os.path.join(os.getcwd(),"static/submit_video.html"))}
     """
     return HTMLResponse(content=html_content)
 
