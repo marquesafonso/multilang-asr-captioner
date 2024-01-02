@@ -31,7 +31,11 @@ logging.basicConfig(filename='main.log',
 
 @app.get("/")
 async def root():
-    return {"message": "Hello from multilang-asr-captioner"}
+    html_content = f"""
+    {read_html(os.path.join(os.getcwd(),"static/landing_page.html"))}
+    """
+    return HTMLResponse(content=html_content)
+
 
 @app.get("/submit_video/")
 async def get_form():

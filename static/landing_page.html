@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            /* CSS Styles */
+            body {
+                font-family: 'Arial', sans-serif;
+                background-color: #f0f0f0;
+                color: #333;
+                line-height: 1.6;
+                text-align: center;
+                padding-top: 50px;
+                margin: 0;
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+            }
+
+            .container {
+                width: 90%;
+                max-width: 1000px; /* Increased max width */
+                margin: auto;
+                padding: 40px; /* Increased padding for more space */
+                background: #ffffff;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); /* Enhanced shadowing */
+                transform: translateY(-35%);
+            }
+
+            h1 {
+                color: #333;
+                margin-bottom: 20px;
+            }
+
+            p {
+                font-size: 18px;
+                color: #666;
+                margin-bottom: 30px;
+            }
+
+            .button {
+                display: inline-block;
+                padding: 15px 30px; /* Increased padding for larger buttons */
+                margin: 10px;
+                border-radius: 4px; /* Slightly more rounded corners */
+                color: white;
+                background-color: #4CAF50;
+                text-decoration: none;
+                font-size: 18px;
+                transition: background-color 0.3s, box-shadow 0.3s;
+            }
+
+            .button:hover {
+                background-color: #45a049;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Subtle hover effect */
+            }
+
+            .button.docs {
+                background-color: #008CBA;
+            }
+
+            .button.docs:hover {
+                background-color: #007BAA;
+            }
+            /* Responsiveness */
+            @media (max-width: 768px) {
+                .container {
+                    width: 95%;
+                    padding: 20px;
+                    display: flex; /* Added to create a flex container */
+                    flex-direction: column; /* Stack elements vertically */
+                    align-items: center; /* Center-align items for a neat look */
+                }
+
+                h1 {
+                    font-size: 24px;
+                }
+
+                p {
+                    font-size: 16px;
+                    text-align: center; /* Center text for a balanced appearance */
+                }
+
+                .button {
+                    width: 80%; /* Set a specific width for both buttons */
+                    padding: 10px 20px;
+                    font-size: 16px;
+                    margin-bottom: 10px; /* Add some space between the buttons */
+                }
+
+                /* Ensure buttons are the same size */
+                .button.submit, .button.docs {
+                    width: calc(80% - 20px); /* Adjusting width to account for padding */
+                }
+            }
+
+            @media (max-height: 500px) {
+                body {
+                    padding-top: 20px;
+                    height: auto;
+                }
+
+                .container {
+                    align-items: center; /* Ensure center alignment in constrained height */
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Multilang-ASR-Captioner</h1>
+            <p>A multilingual automatic speech recognition and video captioning CLI tool using faster whisper on cpu.</p>
+            <a href="/submit_video" class="button submit">Submit Video</a>
+            <a href="/docs" class="button docs">Documentation</a>
+        </div>
+    </body>
+</html>
