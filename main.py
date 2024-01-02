@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, HTTPException, File, Form, Depends
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Optional
+from pydantic import BaseModel, validator
 from utils.process_video import process_video
 from utils.zip_response import zip_response
 from utils.api_configs import api_configs
@@ -29,6 +30,25 @@ logging.basicConfig(filename='main.log',
                 format='%(asctime)s %(levelname)s %(message)s',
                 datefmt='%m/%d/%Y %I:%M:%S %p')
 
+class MP4Video(BaseModel):
+    video_file: UploadFile
+
+    @validator('video_file')
+    def validate_video_file(cls, v):
+        if not v.filename.endswith('.mp4'):
+            raise HTTPException(status_code=500, detail='Invalid video file type. Please upload an MP4 file.')
+        return v
+
+class SRTFile(BaseModel):
+    srt_file: Optional[UploadFile] = None
+
+    @validator('srt_file')
+    def validate_srt_file(cls, v):
+        if v.size > 0 and not v.filename.endswith('.srt'):
+            raise HTTPException(status_code=422, detail='Invalid subtitle file type. Please upload an SRT file.')
+        return v
+
+
 @app.get("/")
 async def root():
     html_content = f"""
@@ -45,8 +65,8 @@ async def get_form():
     return HTMLResponse(content=html_content)
 
 @app.post("/process_video/")
-async def process_video_api(video_file: UploadFile = File(...),
-                            srt_file: Optional[UploadFile] = File(...),
+async def process_video_api(video_file: MP4Video = Depends(),
+                            srt_file: SRTFile = Depends(),
                             max_words_per_line: Optional[int] = Form(8),
                             fontsize: Optional[int] = Form(36),
                             font: Optional[str] = Form("FuturaPTHeavy"),
@@ -55,10 +75,6 @@ async def process_video_api(video_file: UploadFile = File(...),
                             username: str = Depends(get_current_user)
                             ):
     try:
-        if not str(video_file.filename).endswith('.mp4'):
-            raise HTTPException(status_code=400, detail="Invalid Video File type. Please upload an MP4 file.")
-        if srt_file.size > 0 and not str(srt_file.filename).endswith('.srt'):
-            raise HTTPException(status_code=400, detail="Invalid Subtitles File type. Please upload an SRT file.")
         logging.info("Creating temporary directories")
         temp_dir = os.path.join(os.getcwd(),"temp")
         os.makedirs(temp_dir, exist_ok=True)

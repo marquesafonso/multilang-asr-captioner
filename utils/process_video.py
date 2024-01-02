@@ -1,4 +1,3 @@
-# Import necessary modules
 from utils.transcriber import transcriber
 from utils.subtitler import subtitler
 from utils.convert_video_to_audio import convert_video_to_audio
