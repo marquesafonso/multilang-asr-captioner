@@ -1,6 +1,6 @@
 ## Multilang ASR Captioner
 
-A multilingual automatic speech recognition and video captioning CLI tool using faster whisper on cpu.
+A multilingual automatic speech recognition and video captioning tool using faster whisper on cpu.
 
 ## Requirements and Instalations
 
@@ -43,7 +43,9 @@ A FastAPI API is also made available.
 To start the API run:
 
 ```
-pipenv run uvicorn main:app --reload
+pipenv run python main.py
 ```
 
-Then check the [submit_video](http://127.0.0.1:8000/submit_video/) endpoint.
+Then check the [landing page](http://127.0.0.1:8000). 
+
+From there you will see the [submit_video endpoint](http://127.0.0.1:8000/submit_video/) and the [documentation](http://127.0.0.1:8000/docs/)
