@@ -32,6 +32,13 @@ logging.basicConfig(filename='main.log',
 
 class MP4Video(BaseModel):
     video_file: UploadFile
+    
+    @property
+    def filename(self):
+        return self.video_file.filename
+    @property
+    def file(self):
+        return self.video_file.file
 
     @validator('video_file')
     def validate_video_file(cls, v):
@@ -41,6 +48,16 @@ class MP4Video(BaseModel):
 
 class SRTFile(BaseModel):
     srt_file: Optional[UploadFile] = None
+    
+    @property
+    def filename(self):
+        return self.srt_file.filename
+    @property
+    def file(self):
+        return self.srt_file.file
+    @property
+    def size(self):
+        return self.srt_file.size
 
     @validator('srt_file')
     def validate_srt_file(cls, v):
