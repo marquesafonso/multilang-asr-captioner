@@ -1,5 +1,5 @@
 from faster_whisper import WhisperModel
-import logging, os
+import logging
 
 logging.basicConfig(filename='main.log',
                 encoding='utf-8',

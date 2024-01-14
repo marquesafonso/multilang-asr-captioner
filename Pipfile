@@ -4,16 +4,16 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pytube = "*"
 faster-whisper = "*"
 moviepy = "*"
-tqdm = "*"
-requests = "*"
 python-multipart = "*"
 fastapi = "*"
 uvicorn = "*"
 
 [dev-packages]
+pytube = "*"
+tqdm = "*"
+requests = "*"
 
 [requires]
 python_version = "3.11"

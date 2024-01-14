@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, HTTPException, File, Form, Depends
+from fastapi import FastAPI, UploadFile, HTTPException, Form, Depends
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Optional
@@ -13,7 +13,7 @@ app = FastAPI()
 security = HTTPBasic()
 api_configs_file = os.path.abspath("api_config_example.yml")
 
-def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
+async def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, api_configs(api_configs_file)["secrets"]["username"])
     correct_password = secrets.compare_digest(credentials.password, api_configs(api_configs_file)["secrets"]["password"])
     if not (correct_username and correct_password):
