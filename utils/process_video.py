@@ -19,8 +19,10 @@ def process_video(invideo_filename:str,
                   bg_color:str,
                   text_color:str
                   ):
-    VIDEO_NAME = invideo_filename.split('\\')[-1] 
-    OUTVIDEO_PATH = os.path.join(invideo_filename.split('\\')[-3], invideo_filename.split('\\')[-2], f"result_{VIDEO_NAME}")
+    invideo_filename = os.path.normpath(invideo_filename)
+    invideo_path_parts = invideo_filename.split(os.path.sep)
+    VIDEO_NAME = invideo_path_parts[-1]
+    OUTVIDEO_PATH = os.path.join(invideo_path_parts[-3], invideo_path_parts[-2], f"result_{VIDEO_NAME}")
     if srt_path:
         subtitler(invideo_filename, srt_path, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
         return OUTVIDEO_PATH
