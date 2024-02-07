@@ -7,12 +7,8 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
-# Install ImageMagick
-RUN apt-get update && \
-    apt-get install -y imagemagick && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
+#Install ImageMagick
+RUN apt-get update && apt-get install -y imagemagick && sed -i '91d' /etc/ImageMagick-6/policy.xml
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
