@@ -37,17 +37,8 @@ def transcriber(input_path:str,
                 srt_path:str,
                 max_words_per_line:int):
     
-    model_size = "large-v3"
-
-    # Run on GPU with FP16
-    # model = WhisperModel(model_size, device="cuda", compute_type="float16")
-
-    # or run on GPU with INT8
-    # model = WhisperModel(model_size, device="cuda", compute_type="int8_float16")
-    # or run on CPU with INT8
-    logging.info("Logging Whisper model...")
+    model_size = "distil-large-v3"
     model = WhisperModel(model_size, device="cpu", compute_type="int8")
-    logging.info("Starting transcription...")
     segments, info = model.transcribe(
         input_path,
         beam_size=5,
@@ -55,7 +46,5 @@ def transcriber(input_path:str,
         vad_parameters=dict(min_silence_duration_ms=500),
         word_timestamps=True
     )
-
     logging.info("Detected language '%s' with probability %f" % (info.language, info.language_probability))
-    logging.info("Writing file...")
     write_srt(segments=segments, srt_path=srt_path, max_words_per_line=max_words_per_line)

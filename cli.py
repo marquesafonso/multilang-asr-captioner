@@ -36,17 +36,17 @@ def main(video_url:str,
             pbar.update(25)
             subtitler(INVIDEO_PATH, SRT_PATH, OUTVIDEO_PATH,fontsize, font, bg_color, text_color)
             pbar.update(25)
-            return
-        INVIDEO_PATH = os.path.join(INVIDEO_DIR, f"{invideo_filename}.mp4")
-        INAUDIO_PATH = os.path.join(INVIDEO_DIR, f"{invideo_filename}.m4a")
-        if not os.path.exists(INAUDIO_PATH):
-            convert_video_to_audio(INVIDEO_PATH,INAUDIO_PATH)
-        pbar.update(50)
-        if not os.path.exists(SRT_PATH):
-            transcriber(INAUDIO_PATH, SRT_PATH, max_words_per_line)
-        pbar.update(25)
-        subtitler(INVIDEO_PATH, SRT_PATH, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
-        pbar.update(25)
+        else:
+            INVIDEO_PATH = os.path.join(INVIDEO_DIR, f"{invideo_filename}.mp4")
+            INAUDIO_PATH = os.path.join(INVIDEO_DIR, f"{invideo_filename}.m4a")
+            if not os.path.exists(INAUDIO_PATH):
+                convert_video_to_audio(INVIDEO_PATH,INAUDIO_PATH)
+            pbar.update(50)
+            if not os.path.exists(SRT_PATH):
+                transcriber(INAUDIO_PATH, SRT_PATH, max_words_per_line)
+            pbar.update(25)
+            subtitler(INVIDEO_PATH, SRT_PATH, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
+            pbar.update(25)
 
 if __name__ == '__main__':
     parser = ArgumentParser()
