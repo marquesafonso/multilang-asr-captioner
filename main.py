@@ -9,6 +9,8 @@ from utils.api_configs import api_configs
 from utils.read_html import read_html
 import shutil, os, logging, uvicorn, secrets
 
+#TODO: upgrade project dependencies for the soon to be released version of faster-whisper that supports distil-largev3
+
 app = FastAPI()
 security = HTTPBasic()
 api_configs_file = os.path.abspath("api_config_example.yml")
