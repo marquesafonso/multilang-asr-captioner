@@ -3,10 +3,8 @@ import os
 
 def parse_srt(srt_file):
     """Parse the SRT file and return a list of (start, end, text) for each subtitle."""
-
     with open(srt_file, "r", encoding='utf-8') as file:
         lines = file.readlines()
-    
     i = 0
     subtitles = []
     while i < len(lines):
@@ -34,10 +32,8 @@ def subtitler(video_file:str,
     video_file = os.path.abspath(video_file)
     srt_path = os.path.abspath(srt_path)
     output_file = os.path.abspath(output_file)
-    
     clip = VideoFileClip(video_file)
     subtitles = parse_srt(srt_path)
-
     subtitle_clips = []
     for start, end, text in subtitles:
         # Create TextClip with specified styling
@@ -48,6 +44,5 @@ def subtitler(video_file:str,
         subtitle_y_position = clip.h * 4 / 5 
         text_position = (subtitle_x_position, subtitle_y_position)                    
         subtitle_clips.append(txt_clip.set_position(text_position))
-    
     video = CompositeVideoClip([clip] + subtitle_clips)
     video.write_videofile(output_file, codec='libx264', audio_codec='aac')
