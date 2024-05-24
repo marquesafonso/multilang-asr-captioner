@@ -25,7 +25,7 @@ def process_video(invideo_filename:str,
     OUTVIDEO_PATH = os.path.join(invideo_path_parts[-3], invideo_path_parts[-2], f"result_{VIDEO_NAME}")
     if srt_path:
         subtitler(invideo_filename, srt_path, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
-        return OUTVIDEO_PATH
+        return OUTVIDEO_PATH, srt_path
     logging.info("Converting Video to Audio")
     INAUDIO_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.m4a")
     if not os.path.exists(INAUDIO_PATH):
