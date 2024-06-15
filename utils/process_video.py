@@ -13,6 +13,7 @@ logging.basicConfig(filename='main.log',
 # API Function
 def process_video(invideo_filename:str,
                   srt_path: str,
+                  task: str,
                   max_words_per_line:int,
                   fontsize:str,
                   font:str,
@@ -33,7 +34,7 @@ def process_video(invideo_filename:str,
     SRT_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.srt") 
     logging.info("Transcribing...")
     if not os.path.exists(SRT_PATH):
-        transcriber(INAUDIO_PATH, SRT_PATH, max_words_per_line)
+        transcriber(INAUDIO_PATH, SRT_PATH, max_words_per_line, task)
     logging.info("Subtitling...")
     subtitler(invideo_filename, SRT_PATH, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
     return OUTVIDEO_PATH, SRT_PATH

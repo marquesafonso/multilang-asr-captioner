@@ -29,13 +29,15 @@ def write_srt(segments, srt_path, max_words_per_line):
 
 def transcriber(input_path:str,
                 srt_path:str,
-                max_words_per_line:int):
+                max_words_per_line:int,
+                task:str):
     #TODO: model_size = "distil-large-v3" -> need to wait for new pypi version of faster-whisper (pull request already merged)
     model_size = "large-v3"
     model = WhisperModel(model_size, device="cpu", compute_type="int8") #TODO: add condition_on_previous_text=False when using distil-whisper
     segments, info = model.transcribe(
         input_path,
         beam_size=5,
+        task=task,
         vad_filter=True,
         vad_parameters=dict(min_silence_duration_ms=500),
         word_timestamps=True

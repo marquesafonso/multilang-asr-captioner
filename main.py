@@ -86,14 +86,16 @@ async def get_form():
 @app.post("/process_video/")
 async def process_video_api(video_file: MP4Video = Depends(),
                             srt_file: SRTFile = Depends(),
-                            max_words_per_line: Optional[int] = Form(8),
-                            fontsize: Optional[int] = Form(36),
+                            task: Optional[str] = Form("transcribe"),
+                            max_words_per_line: Optional[int] = Form(6),
+                            fontsize: Optional[int] = Form(42),
                             font: Optional[str] = Form("FuturaPTHeavy"),
                             bg_color: Optional[str] = Form("#070a13b3"),
                             text_color: Optional[str] = Form("white"),
                             username: str = Depends(get_current_user)
                             ):
     try:
+        print(task)
         logging.info("Creating temporary directories")
         temp_dir = os.path.join(os.getcwd(),"temp")
         os.makedirs(temp_dir, exist_ok=True)
@@ -115,12 +117,12 @@ async def process_video_api(video_file: MP4Video = Depends(),
                 finally:
                     srt_file.file.close()
             logging.info("Processing the video...")
-            output_path, _ = process_video(temp_input_path, SRT_PATH, max_words_per_line, fontsize, font, bg_color, text_color)
+            output_path, _ = process_video(temp_input_path, SRT_PATH, task, max_words_per_line, fontsize, font, bg_color, text_color)
             logging.info("Zipping response...")
             zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, SRT_PATH])
             return FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
         logging.info("Processing the video...")
-        output_path, srt_path = process_video(temp_input_path, None, max_words_per_line, fontsize, font, bg_color, text_color)
+        output_path, srt_path = process_video(temp_input_path, None, task, max_words_per_line, fontsize, font, bg_color, text_color)
         logging.info("Zipping response...")
         zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, srt_path])
         return  FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
