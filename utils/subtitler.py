@@ -10,8 +10,8 @@ def parse_srt(srt_file):
     while i < len(lines):
         if lines[i].strip().isdigit():
             timing_str = lines[i+1].strip().split(" --> ")
-            start = timing_str[0].replace(',', '.')
-            end = timing_str[1].replace(',', '.')
+            start = timing_str[0]
+            end = timing_str[1]
             text = lines[i+2].strip()
             subtitles.append((start, end, text))
             i += 4
