@@ -95,7 +95,6 @@ async def process_video_api(video_file: MP4Video = Depends(),
                             username: str = Depends(get_current_user)
                             ):
     try:
-        print(task)
         logging.info("Creating temporary directories")
         temp_dir = os.path.join(os.getcwd(),"temp")
         os.makedirs(temp_dir, exist_ok=True)
