@@ -32,7 +32,7 @@ def subtitler(video_file:str,
     video_file = os.path.abspath(video_file)
     srt_path = os.path.abspath(srt_path)
     output_file = os.path.abspath(output_file)
-    clip = VideoFileClip(video_file)
+    clip = VideoFileClip(filename=video_file, target_resolution=None, resize_algorithm='bitexact')
     subtitles = parse_srt(srt_path)
     subtitle_clips = []
     for start, end, text in subtitles:
@@ -44,5 +44,5 @@ def subtitler(video_file:str,
         subtitle_y_position = clip.h * 4 / 5 
         text_position = (subtitle_x_position, subtitle_y_position)                    
         subtitle_clips.append(txt_clip.set_position(text_position))
-    video = CompositeVideoClip([clip] + subtitle_clips)
+    video = CompositeVideoClip(size=(clip.h,clip.w), clips=[clip] + subtitle_clips)
     video.write_videofile(output_file, codec='libx264', audio_codec='aac')
