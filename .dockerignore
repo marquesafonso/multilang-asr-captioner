@@ -2,10 +2,8 @@
 .devcontainer
 __pycache__/
 *.git
-data/
 temp/
 archive/
-cli.py
 Pipfile
 Pipfile.lock
 api_config.yml
