@@ -1,6 +1,8 @@
 ## Multilang ASR Captioner
 
-A multilingual automatic speech recognition and video captioning tool using faster whisper on cpu.
+A multilingual automatic speech recognition and video captioning tool using faster whisper. 
+
+Supports real-time translation to english. Runs on consumer grade cpu.
 
 <video width="400" height="300" src="https://github.com/marquesafonso/multilang-asr-captioner/assets/79766107/fcff8ac1-cdfc-4400-821c-f797d84c2d8a"></video>
 
@@ -26,7 +28,7 @@ Check the [landing page](http://127.0.0.1:8000).
 
 From there you will see the [submit_video endpoint](http://127.0.0.1:8000/submit_video/) and the [documentation](http://127.0.0.1:8000/docs/)
 
-**Tip**: on Linux or Mac localhost will resolve directly to 0.0.0.0 but on windows you will need to change it to 127.0.0.1
+**Tip**: on Linux or Mac localhost will resolve directly to 0.0.0.0 but on windows you will need to change it to 127.0.0.1 or localhost
 
 ### Local
 
@@ -62,18 +64,4 @@ Then check the [landing page](http://127.0.0.1:8000).
 
 From there you will see the [submit_video endpoint](http://127.0.0.1:8000/submit_video/) and the [documentation](http://127.0.0.1:8000/docs/)
 
-**Tip**: on Linux or Mac localhost will resolve directly to 0.0.0.0 but on windows you will need to change it to 127.0.0.1
-
-### Command Line Interface
-
-Run the following code to use the CLI. The input file must be in mp4 format.
-
-```
-pipenv run python cli.py --invideo_filename '<your_file_name>' --max_words_per_line 8
-```
-
-Fontsize, Font, Background Color and Text Color arguments are available:
-
-```
-pipenv run python cli.py --invideo_filename '<your_file>' --max_words_per_line 8 --fontsize 28 --font "Arial-Bold" --bg_color None --text_color 'white'
-```
+**Tip**: on Linux or Mac localhost will resolve directly to 0.0.0.0 but on windows you will need to change it to 127.0.0.1 or localhost
