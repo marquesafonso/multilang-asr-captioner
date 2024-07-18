@@ -14,15 +14,14 @@ You'll need to install [docker](https://www.docker.com/products/docker-desktop/)
 
 Then, follow the steps below.
 
-    1. clone the repo
-    ```{bash}
-    git clone git@github.com:marquesafonso/multilang-asr-captioner.git
-    ```
-    2. Build and run the container using docker-compose
-
-    ```{bash}
-    docker compose up
-    ```
+1. clone the repo
+```{bash}
+git clone git@github.com:marquesafonso/multilang-asr-captioner.git
+```
+2. Build and run the container using docker-compose
+```{bash}
+docker compose up
+```
 
 Check the [landing page](http://127.0.0.1:8000). 
 
@@ -52,9 +51,7 @@ Note that this assumes a proper Git installation and ssh key configuration.
 
 ### API
 
-A FastAPI API is available. This is the easiest way to use the program locally, akin to docker.
-
-To start the API run:
+A FastAPI API is available. To start the API locally, run:
 
 ```
 pipenv run python main.py
