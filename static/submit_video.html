@@ -9,49 +9,70 @@
                 background-color: #f0f0f0;
                 color: #333;
                 line-height: 1.6;
+                margin: 0;
+                padding: 0;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
             }
 
             form {
-                max-width: 400px;
-                margin: 10px auto;
-                padding: 4px 20px;
+                max-width: 900px;
+                margin: .9rem auto;
+                padding: 1rem;
                 background: #ffffff;
                 border-radius: 8px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-                padding-bottom: 0.5rem;
+                box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+                display: flex;
+                flex-direction: column;
+            }
+
+            .form-wrapper {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+
+            .form-group {
+                flex: 1;
+                min-width: calc(50% - 20px);
+                box-sizing: border-box;
+            }
+
+            .form-group h3 {
+                margin-bottom: 15px;
+                color: #4CAF50;
+                font-size: 18px;
+                border-bottom: 2px solid #4CAF50;
+                padding-bottom: 5px;
             }
 
             input[type=file],
             input[type=number],
-            input[type=text] {
-                width: 95%;
-                padding: 10px;
-                margin-bottom: 10px;
-                border-radius: 4px;
-                border: 1px solid #ddd;
-                box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-            }
+            input[type=text],
             select {
-                width: 30%;
+                width: 100%;
                 padding: 10px;
                 margin-bottom: 10px;
                 border-radius: 4px;
                 border: 1px solid #ddd;
                 box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+                font-size: 13px;
+                box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
             }
 
             input[type=submit] {
-                width: 25%;
+                width: 100%;
                 background-color: #4CAF50;
                 color: white;
-                padding: 7.5px 15px;
+                padding: 12px 18px;
                 border: none;
                 border-radius: 5px;
                 cursor: pointer;
-                font-size: 12px;
-                display: block;
-                margin-right: auto;
-                margin-left: auto;
+                font-size: 15px;
+                margin-top: 20px;
+                transition: background-color 0.3s ease;
+                box-sizing: border-box;
             }
 
             input[type=submit]:hover {
@@ -61,13 +82,13 @@
             label {
                 margin-top: 10px;
                 display: block;
+                font-weight: bold;
+                font-size: 13px;
             }
 
             .footer {
                 width: 100%;
                 background-color: #f0f0f0;
-                padding: 0;
-                position: absolute;
                 text-align: center;
             }
 
@@ -77,40 +98,93 @@
             }
 
             .fa-github:hover {
-                transform: scale(1.2)
+                transform: scale(1.2);
             }
-            .fa-github{
-                color: #000000
+
+            .fa-github {
+                color: #000000;
             }
+
             .fa-linkedin:hover {
-                transform: scale(1.2)
+                transform: scale(1.2);
             }
+
             .fa-linkedin {
-                color: #0077B5
+                color: #0077B5;
             }
+
             /* Additional Responsiveness */
+            @media (max-width: 992px) {
+                form {
+                    max-width: 90%;
+                    margin-left: 15%;
+                    margin-right: 15%; 
+                    padding: 15px;
+                }
+
+                .form-wrapper {
+                    flex-direction: column;
+                }
+
+                .form-group {
+                    min-width: 100%;
+                }
+            }
+
             @media (max-width: 768px) {
                 form {
-                    width: 90%;
+                    max-width: 90%;
+                    margin-left: 10%;
+                    margin-right: 10%;
+                    padding: 15px;
+                }
+            }
+
+            @media (max-width: 480px) {
+                form {
+                    max-width: 90%;
+                    margin-left: 5%;
+                    margin-right: 5%;
+                    padding: 10px;
                 }
             }
         </style>
     </head>
     <body>
         <form action="/process_video/" enctype="multipart/form-data" method="post">
-            Video File: <input type="file" name="video_file"><br>
-            Subtitles File: <input type="file" name="srt_file"><br>
-            <label for="task">Task</label>
-            <select id="task" name="task">
-                <option value="transcribe">Transcribe</option>
-                <option value="translate">Translate</option>
-            </select><br>
-            Max words per line: <input type="number" name="max_words_per_line" value="6"><br>
-            Font size: <input type="number" name="fontsize" value="42"><br>
-            Font: <input type="text" name="font" value="FuturaPTHeavy"><br>
-            Background color (Pro tip: #00FFFF00 = transparent): <input type="text" name="bg_color" value="#070a13b3"><br>
-            Text color: <input type="text" name="text_color" value="white"><br>
-            <input type="submit">
+            <div class="form-wrapper">
+                <div class="form-group">
+                    <h3>Inputs & Task Selection</h3>
+                    <label for="video_file">Video File</label>
+                    <input type="file" id="video_file" name="video_file"><br>
+                    <label for="srt_file">Subtitles File</label>
+                    <input type="file" id="srt_file" name="srt_file"><br>
+                    <label for="task">Task</label>
+                    <select id="task" name="task">
+                        <option value="transcribe">Transcribe</option>
+                        <option value="translate">Translate</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <h3>Visual Parameters</h3>
+                    <label for="max_words_per_line">Max words per line</label>
+                    <input type="number" id="max_words_per_line" name="max_words_per_line" value="6"><br>
+                    <label for="fontsize">Font size</label>
+                    <input type="number" id="fontsize" name="fontsize" value="42"><br>
+                    <label for="font">Font:</label>
+                    <input type="text" id="font" name="font" value="FuturaPTHeavy"><br>
+                    <label for="bg_color">Background color</label>
+                    <input type="text" id="bg_color" name="bg_color" value="#00FFFF00"><br>
+                    <label for="text_color">Text color</label>
+                    <input type="text" id="text_color" name="text_color" value="white"><br>
+                    <label for="caption_width">Caption width</label>
+                    <select id="caption_width" name="caption_width">
+                        <option value="desktop">Desktop</option>
+                        <option value="mobile">Mobile</option>
+                    </select>
+                </div>
+            </div>
+            <input type="submit" value="Submit">
        </form>
         <!-- Footer -->
         <div class="footer">

@@ -14,12 +14,9 @@ def convert_seconds_to_time(seconds):
     hours, remainder = divmod(seconds, 3600)
     minutes, remainder = divmod(remainder, 60)
     whole_seconds = int(remainder)
-    milliseconds = int((remainder - whole_seconds) * 1000)
+    milliseconds = int((remainder - whole_seconds) * 1000)    
+    return f"{int(hours):02}:{int(minutes):02}:{whole_seconds:02},{milliseconds:03}"
 
-    # Format the time string
-    time_string = f"{int(hours):02}:{int(minutes):02}:{whole_seconds:02},{milliseconds:03}"
-    
-    return time_string
 
 def write_srt(segments, srt_path, max_words_per_line):
     """Write segments to an SRT file with a maximum number of words per line."""

@@ -18,14 +18,15 @@ def process_video(invideo_filename:str,
                   fontsize:str,
                   font:str,
                   bg_color:str,
-                  text_color:str
+                  text_color:str,
+                  caption_width:str
                   ):
     invideo_filename = os.path.normpath(invideo_filename)
     invideo_path_parts = invideo_filename.split(os.path.sep)
     VIDEO_NAME = invideo_path_parts[-1]
     OUTVIDEO_PATH = os.path.join(invideo_path_parts[-3], invideo_path_parts[-2], f"result_{VIDEO_NAME}")
     if srt_path:
-        subtitler(invideo_filename, srt_path, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
+        subtitler(invideo_filename, srt_path, OUTVIDEO_PATH, fontsize, font, bg_color, text_color, caption_width)
         return OUTVIDEO_PATH, srt_path
     logging.info("Converting Video to Audio")
     INAUDIO_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.m4a")
@@ -36,5 +37,5 @@ def process_video(invideo_filename:str,
     if not os.path.exists(SRT_PATH):
         transcriber(INAUDIO_PATH, SRT_PATH, max_words_per_line, task)
     logging.info("Subtitling...")
-    subtitler(invideo_filename, SRT_PATH, OUTVIDEO_PATH, fontsize, font, bg_color, text_color)
+    subtitler(invideo_filename, SRT_PATH, OUTVIDEO_PATH, fontsize, font, bg_color, text_color, caption_width)
     return OUTVIDEO_PATH, SRT_PATH
