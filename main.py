@@ -2,11 +2,12 @@ from fastapi import FastAPI, UploadFile, HTTPException, Form, Depends
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from typing import Optional
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 from utils.process_video import process_video
 from utils.zip_response import zip_response
 from utils.api_configs import api_configs
 from utils.read_html import read_html
+from utils.archiver import archiver
 import shutil, os, logging, uvicorn, secrets
 
 #TODO: upgrade project dependencies for the soon to be released version of faster-whisper that supports distil-largev3
@@ -42,7 +43,7 @@ class MP4Video(BaseModel):
     def file(self):
         return self.video_file.file
 
-    @validator('video_file')
+    @field_validator('video_file')
     def validate_video_file(cls, v):
         if not v.filename.endswith('.mp4'):
             raise HTTPException(status_code=500, detail='Invalid video file type. Please upload an MP4 file.')
@@ -61,7 +62,7 @@ class SRTFile(BaseModel):
     def size(self):
         return self.srt_file.size
 
-    @validator('srt_file')
+    @field_validator('srt_file')
     def validate_srt_file(cls, v):
         if v.size > 0 and not v.filename.endswith('.srt'):
             raise HTTPException(status_code=422, detail='Invalid subtitle file type. Please upload an SRT file.')
@@ -92,11 +93,12 @@ async def process_video_api(video_file: MP4Video = Depends(),
                             font: Optional[str] = Form("FuturaPTHeavy"),
                             bg_color: Optional[str] = Form("#070a13b3"),
                             text_color: Optional[str] = Form("white"),
-                            caption_width: Optional[str] = Form("desktop"),
+                            caption_mode: Optional[str] = Form("desktop"),
                             username: str = Depends(get_current_user)
                             ):
     try:
         logging.info("Creating temporary directories")
+        print(caption_mode)
         temp_dir = os.path.join(os.getcwd(),"temp")
         os.makedirs(temp_dir, exist_ok=True)
         temp_vid_dir = os.path.join(temp_dir,video_file.filename.split('.')[0])
@@ -117,12 +119,12 @@ async def process_video_api(video_file: MP4Video = Depends(),
                 finally:
                     srt_file.file.close()
             logging.info("Processing the video...")
-            output_path, _ = process_video(temp_input_path, SRT_PATH, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_width)
+            output_path, _ = process_video(temp_input_path, SRT_PATH, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode)
             logging.info("Zipping response...")
             zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, SRT_PATH])
             return FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
         logging.info("Processing the video...")
-        output_path, srt_path = process_video(temp_input_path, None, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_width)
+        output_path, srt_path = process_video(temp_input_path, None, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode)
         logging.info("Zipping response...")
         zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, srt_path])
         return  FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
@@ -132,4 +134,8 @@ async def process_video_api(video_file: MP4Video = Depends(),
     
 if __name__ == "__main__":
     # Use Uvicorn to run the application
+    try:
+        archiver()
+    except FileNotFoundError:
+        pass
     uvicorn.run(app, host="0.0.0.0", port=8000)

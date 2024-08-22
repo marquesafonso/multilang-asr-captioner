@@ -1,7 +1,7 @@
 import shutil, os
 from datetime import datetime
 
-def archiver(timestamp:datetime):
+def archiver(timestamp:datetime=datetime.now()):
     TIME = f"{timestamp.year:4d}-{timestamp.month:02d}-{timestamp.day:02d}_{timestamp.hour:02d}-{timestamp.minute:02d}"
     ARCHIVE = os.path.abspath(f"archive/{TIME}")
     TEMP_DIR = os.path.abspath("temp/")
