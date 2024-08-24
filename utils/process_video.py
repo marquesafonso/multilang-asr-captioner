@@ -1,6 +1,5 @@
 from utils.transcriber import transcriber
 from utils.subtitler import subtitler
-from utils.convert_video_to_audio import convert_video_to_audio
 import logging, os
 
 # Set up logging
@@ -19,7 +18,8 @@ def process_video(invideo_filename:str,
                   font:str,
                   bg_color:str,
                   text_color:str,
-                  caption_mode:str
+                  caption_mode:str,
+                  config_file:str
                   ):
     invideo_filename = os.path.normpath(invideo_filename)
     invideo_path_parts = invideo_filename.split(os.path.sep)
@@ -28,14 +28,10 @@ def process_video(invideo_filename:str,
     if srt_path:
         subtitler(invideo_filename, srt_path, OUTVIDEO_PATH, fontsize, font, bg_color, text_color, caption_mode)
         return OUTVIDEO_PATH, srt_path
-    logging.info("Converting Video to Audio")
-    INAUDIO_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.m4a")
-    if not os.path.exists(INAUDIO_PATH):
-        convert_video_to_audio(invideo_filename, INAUDIO_PATH)
     SRT_PATH = os.path.abspath(f"{invideo_filename.split('.')[0]}.srt") 
     logging.info("Transcribing...")
     if not os.path.exists(SRT_PATH):
-        transcriber(INAUDIO_PATH, SRT_PATH, max_words_per_line, task)
+        transcriber(invideo_filename, SRT_PATH, max_words_per_line, task, config_file)
     logging.info("Subtitling...")
     subtitler(invideo_filename, SRT_PATH, OUTVIDEO_PATH, fontsize, font, bg_color, text_color, caption_mode)
     return OUTVIDEO_PATH, SRT_PATH

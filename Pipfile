@@ -4,11 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-faster-whisper = "*"
 moviepy = "*"
 python-multipart = "*"
 fastapi = "*"
 uvicorn = "*"
+gradio-client = "*"
 
 [dev-packages]
 pytube = "*"

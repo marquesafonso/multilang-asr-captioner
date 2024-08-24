@@ -8,13 +8,12 @@ from utils.zip_response import zip_response
 from utils.api_configs import api_configs
 from utils.read_html import read_html
 from utils.archiver import archiver
+from utils.logger import setup_logger
 import shutil, os, logging, uvicorn, secrets
-
-#TODO: upgrade project dependencies for the soon to be released version of faster-whisper that supports distil-largev3
 
 app = FastAPI()
 security = HTTPBasic()
-api_configs_file = os.path.abspath("api_config_example.yml")
+api_configs_file = os.path.abspath("api_config.yml")
 
 async def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, api_configs(api_configs_file)["secrets"]["username"])
@@ -26,12 +25,6 @@ async def get_current_user(credentials: HTTPBasicCredentials = Depends(security)
             headers={"WWW-Authenticate": "Basic"},
         )
     return credentials.username
-
-logging.basicConfig(filename='main.log',
-                encoding='utf-8',
-                level=logging.DEBUG,
-                format='%(asctime)s %(levelname)s %(message)s',
-                datefmt='%m/%d/%Y %I:%M:%S %p')
 
 class MP4Video(BaseModel):
     video_file: UploadFile
@@ -98,7 +91,6 @@ async def process_video_api(video_file: MP4Video = Depends(),
                             ):
     try:
         logging.info("Creating temporary directories")
-        print(caption_mode)
         temp_dir = os.path.join(os.getcwd(),"temp")
         os.makedirs(temp_dir, exist_ok=True)
         temp_vid_dir = os.path.join(temp_dir,video_file.filename.split('.')[0])
@@ -124,7 +116,7 @@ async def process_video_api(video_file: MP4Video = Depends(),
             zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, SRT_PATH])
             return FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
         logging.info("Processing the video...")
-        output_path, srt_path = process_video(temp_input_path, None, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode)
+        output_path, srt_path = process_video(temp_input_path, None, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode, api_configs_file)
         logging.info("Zipping response...")
         zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, srt_path])
         return  FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
@@ -133,9 +125,9 @@ async def process_video_api(video_file: MP4Video = Depends(),
         raise HTTPException(status_code=500, detail=str(e))
     
 if __name__ == "__main__":
-    # Use Uvicorn to run the application
     try:
         archiver()
     except FileNotFoundError:
         pass
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    app_logger = setup_logger('dbLogger', 'db.log', level=logging.DEBUG)
+    uvicorn.run(app, host="0.0.0.0", port=8000, log_config=app_logger)
