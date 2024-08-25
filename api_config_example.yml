@@ -2,3 +2,5 @@ api_config:
   secrets:
     username: user
     password: password
+    hf-token: <your hf-token>
+    hf-space: marquesafonso/multilang-asr-transcriber

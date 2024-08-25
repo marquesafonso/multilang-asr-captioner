@@ -1,4 +1,6 @@
 import logging
+
+# https://signoz.io/guides/python-logging-best-practices/
 # Create and configure a named logger
 def setup_logger(name, log_file, level=logging.INFO):
     logger = logging.getLogger(name)

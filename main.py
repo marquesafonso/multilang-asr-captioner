@@ -125,9 +125,5 @@ async def process_video_api(video_file: MP4Video = Depends(),
         raise HTTPException(status_code=500, detail=str(e))
     
 if __name__ == "__main__":
-    try:
-        archiver()
-    except FileNotFoundError:
-        pass
-    app_logger = setup_logger('dbLogger', 'db.log', level=logging.DEBUG)
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_config=app_logger)
+    app_logger = setup_logger('appLogger', 'main.log', level=logging.DEBUG)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
