@@ -3,9 +3,7 @@ from typing import Optional
 
 from utils.process_video import process_video
 from utils.zip_response import zip_response
-from utils.api_configs import api_configs
 from utils.read_html import read_html
-from utils.logger import setup_logger
 
 from fastapi import FastAPI, UploadFile, HTTPException, Form, Depends
 from fastapi.responses import HTMLResponse, Response
@@ -117,5 +115,4 @@ async def process_video_api(video_file: MP4Video = Depends(),
         raise HTTPException(status_code=500, detail=str(e))
     
 if __name__ == "__main__":
-    app_logger = setup_logger('appLogger', 'main.log', level=logging.DEBUG)
     uvicorn.run(app, host="0.0.0.0", port=8000)

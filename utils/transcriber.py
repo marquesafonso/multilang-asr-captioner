@@ -1,6 +1,5 @@
 from gradio_client import Client, handle_file
 from utils.api_configs import api_configs
-import tempfile
 
 def transcriber(invideo_file:str, srt_file:str,
         max_words_per_line:int, task:str,
