@@ -1,30 +1,20 @@
-from fastapi import FastAPI, UploadFile, HTTPException, Form, Depends
-from fastapi.responses import FileResponse, HTMLResponse
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
+import shutil, os, logging, uvicorn, tempfile
 from typing import Optional
-from pydantic import BaseModel, field_validator
+
 from utils.process_video import process_video
 from utils.zip_response import zip_response
 from utils.api_configs import api_configs
 from utils.read_html import read_html
-from utils.archiver import archiver
 from utils.logger import setup_logger
-import shutil, os, logging, uvicorn, secrets
+
+from fastapi import FastAPI, UploadFile, HTTPException, Form, Depends
+from fastapi.responses import HTMLResponse, Response
+from fastapi.security import HTTPBasic
+from pydantic import BaseModel, field_validator
 
 app = FastAPI()
 security = HTTPBasic()
 api_configs_file = os.path.abspath("api_config.yml")
-
-async def get_current_user(credentials: HTTPBasicCredentials = Depends(security)):
-    correct_username = secrets.compare_digest(credentials.username, api_configs(api_configs_file)["secrets"]["username"])
-    correct_password = secrets.compare_digest(credentials.password, api_configs(api_configs_file)["secrets"]["password"])
-    if not (correct_username and correct_password):
-        raise HTTPException(
-            status_code=401,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Basic"},
-        )
-    return credentials.username
 
 class MP4Video(BaseModel):
     video_file: UploadFile
@@ -61,7 +51,6 @@ class SRTFile(BaseModel):
             raise HTTPException(status_code=422, detail='Invalid subtitle file type. Please upload an SRT file.')
         return v
 
-
 @app.get("/")
 async def root():
     html_content = f"""
@@ -77,6 +66,13 @@ async def get_form():
     """
     return HTMLResponse(content=html_content)
 
+async def get_temp_dir():
+    dir = tempfile.TemporaryDirectory()
+    try:
+        yield dir.name
+    finally:
+        del dir
+
 @app.post("/process_video/")
 async def process_video_api(video_file: MP4Video = Depends(),
                             srt_file: SRTFile = Depends(),
@@ -87,40 +83,36 @@ async def process_video_api(video_file: MP4Video = Depends(),
                             bg_color: Optional[str] = Form("#070a13b3"),
                             text_color: Optional[str] = Form("white"),
                             caption_mode: Optional[str] = Form("desktop"),
-                            username: str = Depends(get_current_user)
+                            temp_dir: str = Depends(get_temp_dir)
                             ):
     try:
         logging.info("Creating temporary directories")
-        temp_dir = os.path.join(os.getcwd(),"temp")
-        os.makedirs(temp_dir, exist_ok=True)
-        temp_vid_dir = os.path.join(temp_dir,video_file.filename.split('.')[0])
-        os.makedirs(temp_vid_dir, exist_ok=True)
-        temp_input_path = os.path.join(temp_vid_dir, video_file.filename)
-        logging.info("Copying video UploadFile to the temp_input_path")
-        with open(temp_input_path, 'wb') as buffer:
+        with open(os.path.join(temp_dir, video_file.filename), 'w+b') as temp_file:
+            logging.info("Copying video UploadFile to the temporary directory")
             try:
-                shutil.copyfileobj(video_file.file, buffer)
+                shutil.copyfileobj(video_file.file, temp_file)
             finally:
                 video_file.file.close()
-        logging.info("Copying SRT UploadFile to the temp_input_path")
-        if srt_file.size > 0:
-            SRT_PATH = os.path.abspath(f"{temp_input_path.split('.')[0]}.srt")
-            with open(SRT_PATH, 'wb') as buffer:
-                try:
-                    shutil.copyfileobj(srt_file.file, buffer)
-                finally:
-                    srt_file.file.close()
-            logging.info("Processing the video...")
-            output_path, _ = process_video(temp_input_path, SRT_PATH, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode)
-            logging.info("Zipping response...")
-            zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, SRT_PATH])
-            return FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
-        logging.info("Processing the video...")
-        output_path, srt_path = process_video(temp_input_path, None, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode, api_configs_file)
-        logging.info("Zipping response...")
-        zip_path = zip_response(os.path.join(temp_vid_dir,"archive.zip"), [output_path, srt_path])
-        return  FileResponse(zip_path, media_type='application/zip', filename=f"result_{video_file.filename.split('.')[0]}.zip")
-                
+            logging.info("Copying SRT UploadFile to the temp_input_path")
+            if srt_file.size > 0:
+                with open(os.path.join(temp_dir, f"{video_file.filename.split('.')[0]}.srt"), 'w+b') as temp_srt_file:
+                    try:
+                        shutil.copyfileobj(srt_file.file, temp_srt_file)
+                    finally:
+                        srt_file.file.close()
+                logging.info("Processing the video...")
+                output_path, _ = process_video(temp_file.name, temp_srt_file.name, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode)
+                logging.info("Zipping response...")
+                with open(os.path.join(temp_dir, f"{video_file.filename.split('.')[0]}.zip"), 'w+b') as temp_zip_file:
+                    zip_file = zip_response(temp_zip_file.name, [output_path, srt_path])
+                return Response(content = zip_file)
+            with open(os.path.join(temp_dir, f"{video_file.filename.split('.')[0]}.srt"), 'w+b') as temp_srt_file:
+                logging.info("Processing the video...")
+                output_path, srt_path = process_video(temp_file.name, None, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode, api_configs_file)
+                logging.info("Zipping response...")
+                with open(os.path.join(temp_dir, f"{video_file.filename.split('.')[0]}.zip"), 'w+b') as temp_zip_file:
+                    zip_file = zip_response(temp_zip_file.name, [output_path, srt_path])
+                return Response(content = zip_file)  
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
