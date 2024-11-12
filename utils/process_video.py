@@ -5,6 +5,7 @@ from utils.subtitler import subtitler
 def process_video(invideo_file: str,
                   srt_file: str | None,
                   task: str,
+                  model_version: str,
                   max_words_per_line:int,
                   fontsize:str,
                   font:str,
@@ -21,7 +22,7 @@ def process_video(invideo_file: str,
         subtitler(invideo_file, srt_file, OUTVIDEO_PATH, fontsize, font, bg_color, text_color, caption_mode)
     else:
         srt_file = os.path.normpath(f"{invideo_file.split('.')[0]}.srt")
-        transcriber(invideo_file, srt_file, max_words_per_line, task, config_file)
+        transcriber(invideo_file, srt_file, max_words_per_line, task, model_version, config_file)
         logging.info("Subtitling...")
         subtitler(invideo_file, srt_file, OUTVIDEO_PATH, fontsize, font, bg_color, text_color, caption_mode)
     return OUTVIDEO_PATH, srt_file

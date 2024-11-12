@@ -75,6 +75,7 @@ async def get_temp_dir():
 async def process_video_api(video_file: MP4Video = Depends(),
                             srt_file: SRTFile = Depends(),
                             task: Optional[str] = Form("transcribe"),
+                            model_version: Optional[str] = Form("deepdml/faster-whisper-large-v3-turbo-ct2"),
                             max_words_per_line: Optional[int] = Form(6),
                             fontsize: Optional[int] = Form(42),
                             font: Optional[str] = Form("FuturaPTHeavy"),
@@ -99,14 +100,14 @@ async def process_video_api(video_file: MP4Video = Depends(),
                     finally:
                         srt_file.file.close()
                 logging.info("Processing the video...")
-                output_path, _ = process_video(temp_file.name, temp_srt_file.name, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode)
+                output_path, _ = process_video(temp_file.name, temp_srt_file.name, task, model_version, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode)
                 logging.info("Zipping response...")
                 with open(os.path.join(temp_dir, f"{video_file.filename.split('.')[0]}.zip"), 'w+b') as temp_zip_file:
                     zip_file = zip_response(temp_zip_file.name, [output_path, srt_path])
                 return Response(content = zip_file)
             with open(os.path.join(temp_dir, f"{video_file.filename.split('.')[0]}.srt"), 'w+b') as temp_srt_file:
                 logging.info("Processing the video...")
-                output_path, srt_path = process_video(temp_file.name, None, task, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode, api_configs_file)
+                output_path, srt_path = process_video(temp_file.name, None, task, model_version, max_words_per_line, fontsize, font, bg_color, text_color, caption_mode, api_configs_file)
                 logging.info("Zipping response...")
                 with open(os.path.join(temp_dir, f"{video_file.filename.split('.')[0]}.zip"), 'w+b') as temp_zip_file:
                     zip_file = zip_response(temp_zip_file.name, [output_path, srt_path])
