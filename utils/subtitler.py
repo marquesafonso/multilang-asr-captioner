@@ -1,10 +1,9 @@
 from moviepy.editor import VideoFileClip, CompositeVideoClip, TextClip
 import os
 
-def parse_srt(srt_file):
-    """Parse the SRT file and return a list of (start, end, text) for each subtitle."""
-    with open(srt_file, "r", encoding='utf-8') as file:
-        lines = file.readlines()
+def parse_srt(srt_string):
+    """Parse the SRT string and return a list of (start, end, text) for each subtitle."""
+    lines = srt_string.split("\n")
     i = 0
     subtitles = []
     while i < len(lines):
@@ -29,7 +28,7 @@ def filter_caption_width(caption_mode:str):
     return caption_width_ratio, caption_height_ratio
 
 def subtitler(video_file:str,
-            srt_path:str,
+            srt_string:str,
             output_file:str,
             fontsize:int,
             font: str,
@@ -37,12 +36,11 @@ def subtitler(video_file:str,
             text_color:str,
             caption_mode:str
             ):
-    """Add subtitles from an SRT file to a video."""
+    """Add subtitles from an SRT string to a video."""
     video_file = os.path.abspath(video_file)
-    srt_path = os.path.abspath(srt_path)
     output_file = os.path.abspath(output_file)
     clip = VideoFileClip(filename=video_file, target_resolution=None)
-    subtitles = parse_srt(srt_path)
+    subtitles = parse_srt(srt_string)
     subtitle_clips = []
     caption_width_ratio, caption_height_ratio = filter_caption_width(caption_mode)
     for start, end, text in subtitles:
