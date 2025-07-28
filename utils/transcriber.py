@@ -1,14 +1,15 @@
+import os
 from gradio_client import Client, handle_file
-from utils.api_configs import api_configs
+from dotenv import load_dotenv
 
 def transcriber(invideo_file:str, 
                 max_words_per_line:int,
                 task:str,
-                model_version:str,
-                config_file:str
+                model_version:str
                 ):
-        HF_TOKEN = api_configs(config_file)["secrets"]["hf-token"]
-        HF_SPACE = api_configs(config_file)["secrets"]["hf-space"]
+        load_dotenv()
+        HF_TOKEN = os.getenv("HF_TOKEN")
+        HF_SPACE = os.getenv("HF_SPACE")
         client = Client(HF_SPACE, hf_token=HF_TOKEN)
         result = client.predict(
                 file_input=handle_file(invideo_file),

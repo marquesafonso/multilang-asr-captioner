@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Process Video</title>
+    <style>
+        body { font-family: Arial; background: #f0f0f0; padding: 2rem; }
+        form { background: white; padding: 2rem; border-radius: 10px; max-width: 700px; margin: auto; }
+        label, select, input, textarea { display: block; width: 100%; margin-bottom: 1rem; }
+        textarea { height: 200px; font-family: monospace; }
+        input[type="submit"] { background: #4CAF50; color: white; padding: 0.8rem; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <form action="/process_video/" method="post">
+        <h2>Step 2: Edit Transcription & Style</h2>
+
+        <label for="srt_string">Correct Transcription</label>
+        <textarea name="srt_string" id="srt_string">{{ transcription }}</textarea>
+
+        <label for="fontsize">Font size</label>
+        <input type="number" name="fontsize" value="42">
+
+        <label for="font">Font</label>
+        <select id="font" name="font">
+            <option>Loading fonts...</option>
+        </select><br>
+
+        <label for="bg_color">Background color</label>
+        <input type="text" name="bg_color" value="#070a13b3">
+
+        <label for="text_color">Text color</label>
+        <select id="text_color" name="text_color">
+            <option>Loading colors...</option>
+        </select>
+
+        <label for="caption_mode">Caption mode</label>
+        <select name="caption_mode">
+            <option value="desktop">Desktop</option>
+            <option value="mobile">Mobile</option>
+        </select>
+
+        <input type="hidden" name="video_path" value="{{ video_path }}">
+        <input type="submit" value="Render & Download">
+    </form>
+    <script>
+    // Load dropdown options with optional default
+    function populateDropdown(id, url, defaultValue = null) {
+        fetch(url)
+            .then(response => response.text())
+            .then(data => {
+                const select = document.getElementById(id);
+                select.innerHTML = '';
+                const lines = data.split('\n').map(x => x.trim()).filter(Boolean);
+
+                lines.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item;
+                    opt.textContent = item;
+                    if (item === defaultValue) {
+                        opt.selected = true;
+                    }
+                    select.appendChild(opt);
+                });
+            })
+            .catch(error => {
+                console.error(`Error loading ${url}:`, error);
+            });
+    }
+
+    // Set your default font and color here:
+    const DEFAULT_FONT = "Helvetica";
+    const DEFAULT_COLOR = "white";
+
+    // Populate dropdowns with defaults
+    populateDropdown('font', '/static/fonts.txt', DEFAULT_FONT);
+    populateDropdown('text_color', '/static/colors.txt', DEFAULT_COLOR);
+</script>
+</body>
+</html>
