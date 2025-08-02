@@ -14,21 +14,22 @@ from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, Response, RedirectResponse
 from fastapi.security import HTTPBasic
 from pydantic import BaseModel, field_validator
-
+from cachetools import TTLCache
 
 ## THIS IS A BREAKING CHANGE. SRT FILE INPUT DEPRECATED. WIP.
 ## DONE: separate transcriber from subtitler logic. WIP.
 ## DONE: improve loading spinner. WIP (with redirect)
-## TODO: fix tempdir cleanup
-## TODO: add transcription preview component + allow for interactive validation of transcription in-browser. WIP
+## DONE: fix tempdir cleanup
+## DONE: add transcription preview component + allow for interactive validation of transcription in-browser.
 ## TODO: add word level highlighting option
+## TODO: improve UI
 
 app = FastAPI()
 security = HTTPBasic()
 static_dir = os.path.join(os.path.dirname(__file__), 'static')
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 templates = Jinja2Templates(directory=static_dir) 
-temp_store = {}
+cache = TTLCache(maxsize=1024, ttl=600)
 
 class MP4Video(BaseModel):
     video_file: UploadFile
@@ -81,7 +82,7 @@ async def transcribe_api(video_file: MP4Video = Depends(),
         transcription = transcriber(video_path, max_words_per_line, task, model_version)
 
         uid = str(uuid4())
-        temp_store[uid] = {"video_path": video_path, "transcription": transcription}
+        cache[uid] = {"video_path": video_path, "transcription": transcription, "temp_dir_path": temp_dir.name}
         return RedirectResponse(url=f"/process_settings/?uid={uid}", status_code=303)
     
     except Exception as e:
@@ -89,17 +90,19 @@ async def transcribe_api(video_file: MP4Video = Depends(),
 
 @app.get("/process_settings/")
 async def process_settings(request: Request, uid: str):
-    data = temp_store.get(uid)
+    data = cache.get(uid)
     if not data:
         raise HTTPException(404, "Data not found")
     return templates.TemplateResponse("process_settings.html", {
         "request": request,
         "transcription": data["transcription"],
-        "video_path": data["video_path"]
+        "video_path": data["video_path"],
+        "temp_dir_path": data["temp_dir_path"]
     })
 
 @app.post("/process_video/")
 async def process_video_api(video_path: str = Form(...),
+                            temp_dir_path: str = Form(...),
                             srt_string: str = Form(...),
                             fontsize: Optional[int] = Form(42),
                             font: Optional[str] = Form("Helvetica"),
@@ -116,8 +119,6 @@ async def process_video_api(video_path: str = Form(...),
             logging.info("Zipping response...")
         with open(os.path.join(temp_dir.name, f"{video_path.split('.')[0]}.zip"), 'w+b') as temp_zip_file:
             zip_file = zip_response(temp_zip_file.name, [output_path, temp_srt_file.name])
-        temp_dir.cleanup()
-        temp_store = {}
         return Response(
             content = zip_file,
             media_type="application/zip",
@@ -125,6 +126,9 @@ async def process_video_api(video_path: str = Form(...),
             )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if temp_dir_path and os.path.exists(temp_dir_path):
+            shutil.rmtree(temp_dir_path, ignore_errors=True)
     
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)

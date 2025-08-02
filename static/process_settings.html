@@ -40,8 +40,12 @@
         </select>
 
         <input type="hidden" name="video_path" value="{{ video_path }}">
+        <input type="hidden" name="temp_dir_path" value="{{ temp_dir_path }}">
         <input type="submit" value="Render & Download">
     </form>
+    <div style="text-align: center; margin-top: 2em;">
+        <a href="/transcribe_video">Transcribe Another Video</a>
+    </div>
     <script>
     // Load dropdown options with optional default
     function populateDropdown(id, url, defaultValue = null) {
