@@ -1,6 +1,7 @@
-import shutil, os, logging, uvicorn, tempfile
+import shutil, os, logging, uvicorn
 from typing import Optional
 from uuid import uuid4
+from tempfile import TemporaryDirectory
 
 from utils.transcriber import transcriber
 from utils.process_video import process_video
@@ -18,9 +19,9 @@ from pydantic import BaseModel, field_validator
 ## THIS IS A BREAKING CHANGE. SRT FILE INPUT DEPRECATED. WIP.
 ## DONE: separate transcriber from subtitler logic. WIP.
 ## DONE: improve loading spinner. WIP (with redirect)
+## TODO: fix tempdir cleanup
 ## TODO: add transcription preview component + allow for interactive validation of transcription in-browser. WIP
 ## TODO: add word level highlighting option
-
 
 app = FastAPI()
 security = HTTPBasic()
@@ -60,20 +61,20 @@ async def get_form():
     return HTMLResponse(content=html_content)
 
 async def get_temp_dir():
-    dir = tempfile.TemporaryDirectory(delete=False)
+    dir = TemporaryDirectory(delete=False)
     try:
-        yield dir.name
+        yield dir
     except Exception as e:
         HTTPException(status_code=500, detail=str(e))
 
 @app.post("/transcribe/")
 async def transcribe_api(video_file: MP4Video = Depends(),
-                         task: str = Form("transcribe"),
-                         model_version: str = Form("deepdml/faster-whisper-large-v3-turbo-ct2"),
-                         max_words_per_line: int = Form(6),
-                         temp_dir: str = Depends(get_temp_dir)):
+                        task: str = Form("transcribe"),
+                        model_version: str = Form("deepdml/faster-whisper-large-v3-turbo-ct2"),
+                        max_words_per_line: int = Form(6),
+                        temp_dir: TemporaryDirectory = Depends(get_temp_dir)):
     try:
-        video_path = os.path.join(temp_dir, video_file.filename)
+        video_path = os.path.join(temp_dir.name, video_file.filename)
         with open(video_path, 'wb') as f:
             shutil.copyfileobj(video_file.file, f)
 
@@ -105,21 +106,23 @@ async def process_video_api(video_path: str = Form(...),
                             bg_color: Optional[str] = Form("#070a13b3"),
                             text_color: Optional[str] = Form("white"),
                             caption_mode: Optional[str] = Form("desktop"),
-                            temp_dir: str = Depends(get_temp_dir)
+                            temp_dir: TemporaryDirectory = Depends(get_temp_dir)
                             ):
     try:
         output_path = process_video(video_path, srt_string, fontsize, font, bg_color, text_color, caption_mode)
-        with open(os.path.join(temp_dir, f"{video_path.split('.')[0]}.srt"), 'w+') as temp_srt_file:
+        with open(os.path.join(temp_dir.name, f"{video_path.split('.')[0]}.srt"), 'w+') as temp_srt_file:
             logging.info("Processing the video...")
             temp_srt_file.write(srt_string)    
             logging.info("Zipping response...")
-        with open(os.path.join(temp_dir, f"{video_path.split('.')[0]}.zip"), 'w+b') as temp_zip_file:
+        with open(os.path.join(temp_dir.name, f"{video_path.split('.')[0]}.zip"), 'w+b') as temp_zip_file:
             zip_file = zip_response(temp_zip_file.name, [output_path, temp_srt_file.name])
-            return Response(
-                content = zip_file,
-                media_type="application/zip",
-                headers={"Content-Disposition": f"attachment; filename={os.path.basename(video_path).split('.')[0]}.zip"}
-                )
+        temp_dir.cleanup()
+        temp_store = {}
+        return Response(
+            content = zip_file,
+            media_type="application/zip",
+            headers={"Content-Disposition": f"attachment; filename={os.path.basename(video_path).split('.')[0]}.zip"}
+            )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
