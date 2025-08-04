@@ -16,12 +16,12 @@ from fastapi.security import HTTPBasic
 from pydantic import BaseModel, field_validator
 from cachetools import TTLCache
 
-## THIS IS A BREAKING CHANGE. SRT FILE INPUT DEPRECATED. WIP.
-## DONE: separate transcriber from subtitler logic. WIP.
-## DONE: improve loading spinner. WIP (with redirect)
+## THIS IS A BREAKING CHANGE. SRT FILE INPUT DEPRECATED.
+## DONE: separate transcriber from subtitler logic.
+## DONE: improve loading spinner. (redirect)
 ## DONE: fix tempdir cleanup
 ## DONE: add transcription preview component + allow for interactive validation of transcription in-browser.
-## TODO: add word level highlighting option
+## TODO: add word level highlighting option. WIP (word background margins need to be addressed; mobile mode needs work in json mode)
 ## TODO: improve UI
 
 app = FastAPI()
@@ -79,10 +79,14 @@ async def transcribe_api(video_file: MP4Video = Depends(),
         with open(video_path, 'wb') as f:
             shutil.copyfileobj(video_file.file, f)
 
-        transcription = transcriber(video_path, max_words_per_line, task, model_version)
+        transcription_text, transcription_json = transcriber(video_path, max_words_per_line, task, model_version)
 
         uid = str(uuid4())
-        cache[uid] = {"video_path": video_path, "transcription": transcription, "temp_dir_path": temp_dir.name}
+        cache[uid] = {
+            "video_path": video_path,
+            "transcription_text": transcription_text,
+            "transcription_json": transcription_json,
+            "temp_dir_path": temp_dir.name}
         return RedirectResponse(url=f"/process_settings/?uid={uid}", status_code=303)
     
     except Exception as e:
@@ -95,7 +99,8 @@ async def process_settings(request: Request, uid: str):
         raise HTTPException(404, "Data not found")
     return templates.TemplateResponse("process_settings.html", {
         "request": request,
-        "transcription": data["transcription"],
+        "transcription_text": data["transcription_text"],
+        "transcription_json": data["transcription_json"],
         "video_path": data["video_path"],
         "temp_dir_path": data["temp_dir_path"]
     })
@@ -104,15 +109,17 @@ async def process_settings(request: Request, uid: str):
 async def process_video_api(video_path: str = Form(...),
                             temp_dir_path: str = Form(...),
                             srt_string: str = Form(...),
+                            srt_json: str = Form(...),
                             fontsize: Optional[int] = Form(42),
                             font: Optional[str] = Form("Helvetica"),
                             bg_color: Optional[str] = Form("#070a13b3"),
                             text_color: Optional[str] = Form("white"),
+                            highlight_mode: Optional[bool] = Form(False),
                             caption_mode: Optional[str] = Form("desktop"),
                             temp_dir: TemporaryDirectory = Depends(get_temp_dir)
                             ):
     try:
-        output_path = process_video(video_path, srt_string, fontsize, font, bg_color, text_color, caption_mode)
+        output_path = process_video(video_path, srt_string, srt_json, fontsize, font, bg_color, text_color, highlight_mode, caption_mode)
         with open(os.path.join(temp_dir.name, f"{video_path.split('.')[0]}.srt"), 'w+') as temp_srt_file:
             logging.info("Processing the video...")
             temp_srt_file.write(srt_string)    

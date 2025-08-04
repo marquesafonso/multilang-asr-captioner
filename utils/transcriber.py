@@ -19,4 +19,4 @@ def transcriber(invideo_file:str,
                 model_version=model_version,
                 api_name="/predict"
         )
-        return result[0]
+        return result[0], result[3]

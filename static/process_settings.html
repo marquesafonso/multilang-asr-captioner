@@ -8,14 +8,44 @@
         label, select, input, textarea { display: block; width: 100%; margin-bottom: 1rem; }
         textarea { height: 200px; font-family: monospace; }
         input[type="submit"] { background: #4CAF50; color: white; padding: 0.8rem; border: none; cursor: pointer; }
+        .radio-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        }
+
+        .radio-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        }
     </style>
 </head>
 <body>
     <form action="/process_video/" method="post">
         <h2>Step 2: Edit Transcription & Style</h2>
+        
+        <div class="radio-container">
+            <div class="radio-option">
+              <label for="mode_normal">Normal</label>
+              <input type="radio" name="highlight_mode" value="false" id="mode_normal" checked onchange="toggleTranscriptionFields()">
+            </div>
+            <div class="radio-option">
+              <label for="mode_highlight">Word-level</label>
+              <input type="radio" name="highlight_mode" value="true" id="mode_highlight" onchange="toggleTranscriptionFields()">
+            </div>
+          </div>
 
-        <label for="srt_string">Correct Transcription</label>
-        <textarea name="srt_string" id="srt_string">{{ transcription }}</textarea>
+        <!-- Textareas -->
+        <div id="normal_input">
+        <label for="srt_string">Transcription (SRT)</label>
+        <textarea name="srt_string" id="srt_string">{{ transcription_text }}</textarea>
+        </div>
+
+        <div id="highlight_input" style="display: none;">
+        <label for="srt_json">Transcription (JSON)</label>
+        <textarea name="srt_json" id="srt_json">{{ transcription_json }}</textarea>
+        </div>
 
         <label for="fontsize">Font size</label>
         <input type="number" name="fontsize" value="42">
@@ -78,6 +108,11 @@
     // Populate dropdowns with defaults
     populateDropdown('font', '/static/fonts.txt', DEFAULT_FONT);
     populateDropdown('text_color', '/static/colors.txt', DEFAULT_COLOR);
+    function toggleTranscriptionFields() {
+        const isHighlight = document.getElementById('mode_highlight').checked;
+        document.getElementById('normal_input').style.display = isHighlight ? 'none' : 'block';
+        document.getElementById('highlight_input').style.display = isHighlight ? 'block' : 'none';
+    }
 </script>
 </body>
 </html>
