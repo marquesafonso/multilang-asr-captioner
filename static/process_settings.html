@@ -24,9 +24,9 @@
     }
 
     .form-section {
-        display: flex;
-        flex-direction: row;
-        gap: 3rem;
+      display: flex;
+      flex-direction: row;
+      gap: 3rem;
     }
 
     .column {
@@ -115,29 +115,29 @@
 
     <div class="form-section">
       <!-- Left Column -->
-        <div class="column">
+      <div class="column">
         <h3>Highlighting Mode</h3>
-            <div class="radio-container">
-                <div class="radio-option">
-                    <label for="mode_normal">Normal</label>
-                    <input type="radio" name="highlight_mode" value="false" id="mode_normal" checked onchange="toggleTranscriptionFields()">
-                </div>
-                <div class="radio-option">
-                    <label for="mode_highlight">Word-level</label>
-                    <input type="radio" name="highlight_mode" value="true" id="mode_highlight" onchange="toggleTranscriptionFields()">
-                </div>
-            </div>
-
-            <div id="normal_input">
-            <label for="srt_string">Transcription (SRT)</label>
-            <textarea name="srt_string" id="srt_string">{{ transcription_text }}</textarea>
-            </div>
-
-            <div id="highlight_input" style="display: none;">
-                <label for="srt_json">Transcription (JSON)</label>
-                <textarea name="srt_json" id="srt_json"></textarea>
-            </div>
+        <div class="radio-container">
+          <div class="radio-option">
+            <label for="mode_normal">Normal</label>
+            <input type="radio" name="highlight_mode" value="false" id="mode_normal" checked onchange="toggleTranscriptionFields()">
+          </div>
+          <div class="radio-option">
+            <label for="mode_highlight">Word-level</label>
+            <input type="radio" name="highlight_mode" value="true" id="mode_highlight" onchange="toggleTranscriptionFields()">
+          </div>
         </div>
+
+        <div id="normal_input">
+          <label for="srt_string">Transcription (SRT)</label>
+          <textarea name="srt_string" id="srt_string">{{ transcription_text }}</textarea>
+        </div>
+
+        <div id="highlight_input" style="display: none;">
+          <label for="srt_json">Transcription (JSON)</label>
+          <textarea name="srt_json" id="srt_json"></textarea>
+        </div>
+      </div>
 
       <!-- Right Column -->
       <div class="column">
@@ -152,10 +152,17 @@
         </select>
 
         <label for="bg_color">Background color</label>
-        <input type="text" name="bg_color" value="#00FFFF00">
+        <select id="bg_color" name="bg_color">
+          <option>Loading colors...</option>
+        </select>
 
         <label for="text_color">Text color</label>
         <select id="text_color" name="text_color">
+          <option>Loading colors...</option>
+        </select>
+
+        <label for="highlight_color">Highlight color</label>
+        <select id="highlight_color" name="highlight_color">
           <option>Loading colors...</option>
         </select>
 
@@ -213,7 +220,9 @@
       }
 
       populateDropdown('font', '/static/fonts.txt', "Helvetica");
+      populateDropdown('bg_color', '/static/colors.txt', "grey");
       populateDropdown('text_color', '/static/colors.txt', "white");
+      populateDropdown('highlight_color', '/static/colors.txt', "LightBlue");
 
       toggleTranscriptionFields(); // Set proper display state
     });

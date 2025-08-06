@@ -115,11 +115,12 @@ async def process_video_api(video_path: str = Form(...),
                             bg_color: Optional[str] = Form("#070a13b3"),
                             text_color: Optional[str] = Form("white"),
                             highlight_mode: Optional[bool] = Form(False),
+                            highlight_color: Optional[str] = Form("LightBlue"),
                             caption_mode: Optional[str] = Form("desktop"),
                             temp_dir: TemporaryDirectory = Depends(get_temp_dir)
                             ):
     try:
-        output_path = process_video(video_path, srt_string, srt_json, fontsize, font, bg_color, text_color, highlight_mode, caption_mode)
+        output_path = process_video(video_path, srt_string, srt_json, fontsize, font, bg_color, text_color, highlight_mode, highlight_color, caption_mode)
         with open(os.path.join(temp_dir.name, f"{video_path.split('.')[0]}.srt"), 'w+') as temp_srt_file:
             logging.info("Processing the video...")
             temp_srt_file.write(srt_string)    

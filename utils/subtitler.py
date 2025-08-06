@@ -37,6 +37,7 @@ def subtitler(video_file: str,
             bg_color: str,
             text_color: str,
             highlight_mode: bool,
+            highlight_color: str,
             caption_mode: str
             ):
     """Add subtitles to a video, with optional word-level highlighting."""
@@ -55,7 +56,7 @@ def subtitler(video_file: str,
             line_end = float(line["end"])
             line_text = line["text"]
 
-            base_clip = TextClip(line_text, fontsize=fontsize, color=text_color, font=font, method='label')
+            base_clip = TextClip(line_text, fontsize=fontsize, font=font, color=text_color, bg_color=bg_color, method='label')
             base_clip = base_clip.set_start(line_start).set_end(line_end)
 
             # Center the full line
@@ -73,7 +74,7 @@ def subtitler(video_file: str,
 
                 # Create a background-only word clip
                 word_clip = TextClip(word, fontsize=fontsize, color=text_color, stroke_color=text_color, stroke_width=2, font=font,
-                        method='label', bg_color="LightBlue")
+                        method='label', bg_color=highlight_color)
                 word_clip = word_clip.set_start(word_start).set_end(word_end)
                 word_clip = word_clip.set_position((current_x - 7.5, subtitle_y_position))
                 subtitle_clips.append(word_clip)
