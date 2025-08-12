@@ -85,7 +85,7 @@ def subtitler(video_file: str,
                 current_x += word_clip.w + space_width
         video = CompositeVideoClip(size=None, clips=[clip] + subtitle_clips)
         video.set_audio(temp_audiofile)
-        video.write_videofile(output_file, codec='libx264', audio_codec='aac')
+        video.write_videofile(output_file, codec='libx264', audio_codec='aac', temp_audiofile = temp_audiofile)
         return
     # Normal mode
     subtitles = parse_srt(srt_string)
@@ -105,4 +105,4 @@ def subtitler(video_file: str,
         subtitle_clips.append(txt_clip)
     video = CompositeVideoClip(size=None, clips=[clip] + subtitle_clips)
     video.set_audio(temp_audiofile)
-    video.write_videofile(output_file, codec='libx264', audio_codec='aac')
+    video.write_videofile(output_file, codec='libx264', audio_codec='aac', temp_audiofile = temp_audiofile)
