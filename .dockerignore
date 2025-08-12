@@ -5,3 +5,4 @@ __pycache__/
 Pipfile
 Pipfile.lock
 api_config.yml
+.env.example

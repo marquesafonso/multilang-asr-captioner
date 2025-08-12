@@ -38,11 +38,13 @@ def subtitler(video_file: str,
             text_color: str,
             highlight_mode: bool,
             highlight_color: str,
-            caption_mode: str
+            caption_mode: str,
+            temp_dir: str
             ):
     """Add subtitles to a video, with optional word-level highlighting."""
     video_file = os.path.abspath(video_file)
     output_file = os.path.abspath(output_file)
+    temp_audiofile = os.path.join(temp_dir, "temp_audio_file.mp4")
     clip = VideoFileClip(filename=video_file, target_resolution=None)
 
     subtitle_clips = []
@@ -82,6 +84,7 @@ def subtitler(video_file: str,
                 space_width = TextClip(" ", fontsize=fontsize, font=font, method='label').w
                 current_x += word_clip.w + space_width
         video = CompositeVideoClip(size=None, clips=[clip] + subtitle_clips)
+        video.set_audio(temp_audiofile)
         video.write_videofile(output_file, codec='libx264', audio_codec='aac')
         return
     # Normal mode
@@ -101,4 +104,5 @@ def subtitler(video_file: str,
         txt_clip = txt_clip.set_start(start).set_end(end).set_position(text_position)
         subtitle_clips.append(txt_clip)
     video = CompositeVideoClip(size=None, clips=[clip] + subtitle_clips)
+    video.set_audio(temp_audiofile)
     video.write_videofile(output_file, codec='libx264', audio_codec='aac')
