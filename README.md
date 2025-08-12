@@ -5,6 +5,7 @@ emoji: 📚
 colorFrom: red
 colorTo: blue
 app_file: main.py
+app_port: 8000
 pinned: true
 license: cc-by-nc-4.0
 short_description: Multilingual ASR and video captioning tool
