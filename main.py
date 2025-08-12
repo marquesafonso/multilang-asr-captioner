@@ -21,7 +21,7 @@ from cachetools import TTLCache
 ## DONE: improve loading spinner. (redirect)
 ## DONE: fix tempdir cleanup
 ## DONE: add transcription preview component + allow for interactive validation of transcription in-browser.
-## TODO: add word level highlighting option. WIP (word background margins need to be addressed; mobile mode needs work in json mode)
+## TODO: add word level highlighting option. WIP (Avoid caption char overflow by using a max chars heuristic in transcriber)
 ## TODO: improve UI
 
 app = FastAPI()
