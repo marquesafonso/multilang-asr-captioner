@@ -4,9 +4,12 @@ sdk: docker
 emoji: 📚
 colorFrom: red
 colorTo: blue
+app_file: main.py
 pinned: true
+license: cc-by-nc-4.0
 short_description: Multilingual ASR and video captioning tool
 ---
+
 ## Multilang ASR Captioner
 
 A multilingual automatic speech recognition and video captioning tool using faster whisper. 
