@@ -1,3 +1,12 @@
+---
+title: Multilang Asr Captioner
+sdk: docker
+emoji: 📚
+colorFrom: red
+colorTo: blue
+pinned: true
+short_description: Multilingual ASR and video captioning tool
+---
 ## Multilang ASR Captioner
 
 A multilingual automatic speech recognition and video captioning tool using faster whisper. 
