@@ -70,7 +70,7 @@ def subtitler(video_file: str,
             # Calculate word-level highlight positions
             current_x = x_center
             for word_info in line["words"]:
-                word = word_info["word"]
+                word = word_info["word"] + " "
                 word_start = float(word_info["start"])
                 word_end = float(word_info["end"])
 
@@ -80,9 +80,8 @@ def subtitler(video_file: str,
                 word_clip = word_clip.set_start(word_start).set_end(word_end)
                 word_clip = word_clip.set_position((current_x - 7.5, subtitle_y_position))
                 subtitle_clips.append(word_clip)
+                current_x += word_clip.w
 
-                space_width = TextClip(" ", fontsize=fontsize, font=font, method='label').w
-                current_x += word_clip.w + space_width
         video = CompositeVideoClip(size=None, clips=[clip] + subtitle_clips)
         video.set_audio(temp_audiofile)
         video.write_videofile(output_file, codec='libx264', audio_codec='aac', temp_audiofile = temp_audiofile)
