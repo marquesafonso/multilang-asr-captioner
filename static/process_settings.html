@@ -129,12 +129,12 @@
         </div>
 
         <div id="normal_input">
-          <label for="srt_string">Transcription (SRT)</label>
+          <label for="srt_string">Transcription Preview (SRT)</label>
           <textarea name="srt_string" id="srt_string">{{ transcription_text }}</textarea>
         </div>
 
         <div id="highlight_input" style="display: none;">
-          <label for="srt_json">Transcription (JSON)</label>
+          <label for="srt_json">Transcription Preview (JSON)</label>
           <textarea name="srt_json" id="srt_json"></textarea>
         </div>
       </div>
@@ -219,8 +219,8 @@
         document.getElementById("srt_json").value = jsonText;
       }
 
-      populateDropdown('font', '/static/fonts.txt', "Helvetica");
-      populateDropdown('bg_color', '/static/colors.txt', "grey");
+      populateDropdown('font', '/static/fonts.txt', "HelveticaBold");
+      populateDropdown('bg_color', '/static/colors.txt', "transparent");
       populateDropdown('text_color', '/static/colors.txt', "white");
       populateDropdown('highlight_color', '/static/colors.txt', "LightBlue");
 
