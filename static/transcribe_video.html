@@ -8,6 +8,8 @@
         form { background: white; padding: 2rem; border-radius: 10px; max-width: 600px; margin: auto; }
         label, select, input { display: block; width: 100%; margin-bottom: 1rem; }
         input[type="submit"] { background: #4CAF50; color: white; padding: 0.8rem; border: none; cursor: pointer; }
+        .radio-container { display: flex; gap: 2rem; margin-bottom: 1rem;}
+        .radio-option { display: flex; flex-direction: column; align-items: flex-start;}
     </style>
 </head>
 <body>
@@ -32,6 +34,12 @@
 
         <label for="max_words_per_line">Max words per line</label>
         <input type="number" name="max_words_per_line" id="max_words_per_line" value="6">
+
+        <label for="device_type">Device Type</label>
+        <select name="device_type">
+          <option value="desktop">Desktop</option>
+          <option value="mobile">Mobile</option>
+        </select>
        
         <div id="loading" style="display:none; text-align: center; margin-top: 10px; margin-bottom: 10px; font-weight: bold;">
             <i class="fas fa-spinner fa-spin"></i> Processing, please wait...

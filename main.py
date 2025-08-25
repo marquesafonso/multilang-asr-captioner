@@ -16,10 +16,6 @@ from fastapi.security import HTTPBasic
 from pydantic import BaseModel, field_validator
 from cachetools import TTLCache
 
-## TODO: add word level highlighting option. WIP (Avoid caption char overflow by using a max chars heuristic in transcriber)
-## TODO: prevent double for submission in process_video/
-## TODO: add more video format options
-## TODO: Add Box + Word highlighting mode options
 ## TODO: improve UI
 
 app = FastAPI()
@@ -27,9 +23,9 @@ security = HTTPBasic()
 static_dir = os.path.join(os.path.dirname(__file__), 'static')
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
 templates = Jinja2Templates(directory=static_dir) 
-cache = TTLCache(maxsize=1024, ttl=600)
+cache = TTLCache(maxsize=2048, ttl=600)
 
-class MP4Video(BaseModel):
+class Video(BaseModel):
     video_file: UploadFile
     
     @property
@@ -41,7 +37,11 @@ class MP4Video(BaseModel):
 
     @field_validator('video_file')
     def validate_video_file(cls, v):
-        if not v.filename.endswith('.mp4'):
+        video_extensions = ('.webm', '.mkv', '.flv', '.vob', '.ogv', '.ogg', '.rrc', '.gifv',
+                            '.mng', '.mov', '.avi', '.qt', '.wmv', '.yuv', '.rm', '.asf', '.amv', '.mp4',
+                            '.m4p', '.m4v', '.mpg', '.mp2', '.mpeg', '.mpe', '.mpv', '.m4v', '.svi', '.3gp',
+                            '.3g2', '.mxf', '.roq', '.nsv', '.flv', '.f4v', '.f4p', '.f4a', '.f4b', '.mod')
+        if not v.filename.endswith(video_extensions):
             raise HTTPException(status_code=500, detail='Invalid video file type. Please upload an MP4 file.')
         return v
 
@@ -67,24 +67,26 @@ async def get_temp_dir():
         HTTPException(status_code=500, detail=str(e))
 
 @app.post("/transcribe/")
-async def transcribe_api(video_file: MP4Video = Depends(),
+async def transcribe_api(video_file: Video = Depends(),
                         task: str = Form("transcribe"),
                         model_version: str = Form("deepdml/faster-whisper-large-v3-turbo-ct2"),
                         max_words_per_line: int = Form(6),
+                        device_type: str = Form("desktop"),
                         temp_dir: TemporaryDirectory = Depends(get_temp_dir)):
     try:
         video_path = os.path.join(temp_dir.name, video_file.filename)
         with open(video_path, 'wb') as f:
             shutil.copyfileobj(video_file.file, f)
 
-        transcription_text, transcription_json = transcriber(video_path, max_words_per_line, task, model_version)
+        transcription_text, transcription_json = transcriber(video_path, max_words_per_line, task, model_version, device_type)
 
         uid = str(uuid4())
         cache[uid] = {
             "video_path": video_path,
             "transcription_text": transcription_text,
             "transcription_json": transcription_json,
-            "temp_dir_path": temp_dir.name}
+            "temp_dir_path": temp_dir.name,
+            "device_type": device_type}
         return RedirectResponse(url=f"/process_settings/?uid={uid}", status_code=303)
     
     except Exception as e:
@@ -100,7 +102,8 @@ async def process_settings(request: Request, uid: str):
         "transcription_text": data["transcription_text"],
         "transcription_json": data["transcription_json"],
         "video_path": data["video_path"],
-        "temp_dir_path": data["temp_dir_path"]
+        "temp_dir_path": data["temp_dir_path"],
+        "device_type": data["device_type"]
     })
 
 @app.post("/process_video/")
@@ -114,11 +117,11 @@ async def process_video_api(video_path: str = Form(...),
                             text_color: Optional[str] = Form("white"),
                             highlight_mode: Optional[bool] = Form(False),
                             highlight_color: Optional[str] = Form("LightBlue"),
-                            caption_mode: Optional[str] = Form("desktop"),
+                            device_type: Optional[str] = Form("desktop"),
                             temp_dir: TemporaryDirectory = Depends(get_temp_dir)
                             ):
     try:
-        output_path = process_video(video_path, srt_string, srt_json, fontsize, font, bg_color, text_color, highlight_mode, highlight_color, caption_mode, temp_dir.name)
+        output_path = process_video(video_path, srt_string, srt_json, fontsize, font, bg_color, text_color, highlight_mode, highlight_color, device_type, temp_dir.name)
         with open(os.path.join(temp_dir.name, f"{video_path.split('.')[0]}.srt"), 'w+') as temp_srt_file:
             logging.info("Processing the video...")
             temp_srt_file.write(srt_string)    

@@ -18,11 +18,11 @@ def parse_srt(srt_string):
             i += 1
     return subtitles
 
-def filter_caption_width(caption_mode:str):
-    if caption_mode == 'desktop':
+def filter_caption_width(device_type:str):
+    if device_type == 'desktop':
         caption_width_ratio = 0.5
         caption_height_ratio = 0.8
-    elif caption_mode == 'mobile':
+    elif device_type == 'mobile':
         caption_width_ratio = 0.2
         caption_height_ratio = 0.7
     return caption_width_ratio, caption_height_ratio
@@ -38,7 +38,7 @@ def subtitler(video_file: str,
             text_color: str,
             highlight_mode: bool,
             highlight_color: str,
-            caption_mode: str,
+            device_type: str,
             temp_dir: str
             ):
     """Add subtitles to a video, with optional word-level highlighting."""
@@ -49,7 +49,7 @@ def subtitler(video_file: str,
 
     subtitle_clips = []
 
-    caption_width_ratio, caption_height_ratio = filter_caption_width(caption_mode)
+    caption_width_ratio, caption_height_ratio = filter_caption_width(device_type)
     subtitle_y_position = clip.h * caption_height_ratio
     if highlight_mode:
         srt_data = json.loads(json.dumps(eval(srt_json)))

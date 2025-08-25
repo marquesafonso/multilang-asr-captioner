@@ -165,17 +165,12 @@
         <select id="highlight_color" name="highlight_color">
           <option>Loading colors...</option>
         </select>
-
-        <label for="caption_mode">Caption mode</label>
-        <select name="caption_mode">
-          <option value="desktop">Desktop</option>
-          <option value="mobile">Mobile</option>
-        </select>
       </div>
     </div>
 
     <input type="hidden" name="video_path" value="{{ video_path }}">
     <input type="hidden" name="temp_dir_path" value="{{ temp_dir_path }}">
+    <input type="hidden" name="device_type" value="{{ device_type }}">
     <input type="submit" name="submitButton" value="Submit">
   </form>
 

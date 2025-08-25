@@ -5,7 +5,8 @@ from dotenv import load_dotenv
 def transcriber(invideo_file:str, 
                 max_words_per_line:int,
                 task:str,
-                model_version:str
+                model_version:str,
+                device_type:str
                 ):
         load_dotenv()
         HF_TOKEN = os.getenv("HF_TOKEN")
@@ -17,6 +18,7 @@ def transcriber(invideo_file:str,
                 max_words_per_line=max_words_per_line,
                 task=task,
                 model_version=model_version,
+                device_type=device_type,
                 api_name="/predict"
         )
         return result[0], result[3]
