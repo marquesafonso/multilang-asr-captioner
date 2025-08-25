@@ -110,7 +110,7 @@
   </style>
 </head>
 <body>
-  <form action="/process_video/" method="post">
+  <form action="/process_video/" method="post" onsubmit="submitButton.disabled = true; return true;">
     <h2>Step 2: Edit Transcription & Style</h2>
 
     <div class="form-section">
@@ -176,7 +176,7 @@
 
     <input type="hidden" name="video_path" value="{{ video_path }}">
     <input type="hidden" name="temp_dir_path" value="{{ temp_dir_path }}">
-    <input type="submit" value="Submit">
+    <input type="submit" name="submitButton" value="Submit">
   </form>
 
   <div class="centered-link">
@@ -219,7 +219,7 @@
         document.getElementById("srt_json").value = jsonText;
       }
 
-      populateDropdown('font', '/static/fonts.txt', "HelveticaBold");
+      populateDropdown('font', '/static/fonts.txt', "Helvetica-Bold");
       populateDropdown('bg_color', '/static/colors.txt', "transparent");
       populateDropdown('text_color', '/static/colors.txt', "white");
       populateDropdown('highlight_color', '/static/colors.txt', "LightBlue");

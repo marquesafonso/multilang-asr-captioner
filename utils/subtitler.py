@@ -75,7 +75,7 @@ def subtitler(video_file: str,
                 word_end = float(word_info["end"])
 
                 # Create a background-only word clip
-                word_clip = TextClip(word, fontsize=fontsize, color=text_color, stroke_color=text_color, stroke_width=2, font=font,
+                word_clip = TextClip(word, fontsize=fontsize, color=text_color, font=font,
                         method='label', bg_color=highlight_color)
                 word_clip = word_clip.set_start(word_start).set_end(word_end)
                 word_clip = word_clip.set_position((current_x - 7.5, subtitle_y_position))
